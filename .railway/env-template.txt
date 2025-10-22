@@ -1,0 +1,71 @@
+# Railway Environment Variables Template
+# Copy these to your Railway app service settings
+# Generate secrets using the commands in SETUP.md
+
+# === Core Configuration ===
+NODE_ENV=production
+PORT=3000
+
+# === URLs (Update after deployment) ===
+# After Railway generates your domain, update PUBLIC_URL
+PUBLIC_URL=https://your-app.up.railway.app
+STORAGE_URL=https://minio-service.railway.internal:9000/default
+
+# === Database ===
+# DATABASE_URL is automatically set by Railway PostgreSQL service
+# No need to manually configure this
+
+# === Authentication Secrets ===
+# Generate with: openssl rand -base64 64
+ACCESS_TOKEN_SECRET=REPLACE_WITH_GENERATED_SECRET
+REFRESH_TOKEN_SECRET=REPLACE_WITH_GENERATED_SECRET
+
+# === Chrome/Browserless ===
+# Generate with: openssl rand -hex 32
+CHROME_TOKEN=REPLACE_WITH_GENERATED_TOKEN
+CHROME_URL=ws://chrome-service.railway.internal:3000
+CHROME_IGNORE_HTTPS_ERRORS=true
+
+# === Email (Optional - Use Ethereal.email for testing) ===
+MAIL_FROM=noreply@railway.app
+# Get free SMTP testing at https://ethereal.email/create
+# SMTP_URL=smtp://username:password@smtp.ethereal.email:587
+
+# === Storage (Minio Configuration) ===
+STORAGE_ENDPOINT=minio-service.railway.internal
+STORAGE_PORT=9000
+STORAGE_REGION=us-east-1
+STORAGE_BUCKET=default
+STORAGE_ACCESS_KEY=minioadmin
+STORAGE_SECRET_KEY=minioadmin
+STORAGE_USE_SSL=false
+STORAGE_SKIP_BUCKET_CHECK=false
+
+# === Nx Cloud (Optional - for build caching) ===
+NX_CLOUD_ACCESS_TOKEN=MTQ1OWFiOGUtODVjZC00YzI2LTliZTgtZDBlNWJmODc4NzM0fHJlYWQ=
+
+# === Feature Flags (Optional) ===
+# DISABLE_SIGNUPS=false
+# DISABLE_EMAIL_AUTH=false
+
+# === OAuth Providers (Optional) ===
+# GitHub OAuth
+# GITHUB_CLIENT_ID=your_github_client_id
+# GITHUB_CLIENT_SECRET=your_github_client_secret
+# GITHUB_CALLBACK_URL=https://your-app.up.railway.app/api/auth/github/callback
+
+# Google OAuth
+# GOOGLE_CLIENT_ID=your_google_client_id
+# GOOGLE_CLIENT_SECRET=your_google_client_secret
+# GOOGLE_CALLBACK_URL=https://your-app.up.railway.app/api/auth/google/callback
+
+# OpenID Connect (Optional)
+# VITE_OPENID_NAME=OpenID
+# OPENID_AUTHORIZATION_URL=
+# OPENID_CALLBACK_URL=https://your-app.up.railway.app/api/auth/openid/callback
+# OPENID_CLIENT_ID=
+# OPENID_CLIENT_SECRET=
+# OPENID_ISSUER=
+# OPENID_SCOPE=openid profile email
+# OPENID_TOKEN_URL=
+# OPENID_USER_INFO_URL=
