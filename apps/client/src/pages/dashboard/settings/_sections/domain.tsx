@@ -43,9 +43,9 @@ export const DomainSettings = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-2xl font-bold leading-relaxed tracking-tight">{t`Custom Domain`}</h3>
+        <h3 className="text-2xl font-bold leading-relaxed tracking-tight">Custom Domain</h3>
         <p className="leading-relaxed opacity-75">
-          {t`You can map a custom domain to one of your resumes. This feature is only available for self-hosted instances.`}
+          You can map a custom domain to one of your resumes. This feature is only available for self-hosted instances.
         </p>
         <div className="mt-4 space-y-2 text-sm opacity-75">
           <p className="font-semibold">Setup Instructions:</p>
@@ -68,7 +68,7 @@ export const DomainSettings = () => {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t`Domain`}</FormLabel>
+                <FormLabel>Domain</FormLabel>
                 <FormControl>
                   <Input placeholder="www.johndoe.com" {...field} />
                 </FormControl>
@@ -82,11 +82,11 @@ export const DomainSettings = () => {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t`Target Resume`}</FormLabel>
+                <FormLabel>Target Resume</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder={t`Select a resume`} />
+                      <SelectValue placeholder="Select a resume" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -104,7 +104,7 @@ export const DomainSettings = () => {
 
           <div className="flex items-center space-x-2 self-center sm:col-span-2">
             <Button type="submit" disabled={loading}>
-              {t`Save Changes`}
+              Save Changes
             </Button>
           </div>
         </form>
