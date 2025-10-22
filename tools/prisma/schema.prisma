@@ -33,6 +33,10 @@ model User {
   provider         Provider
   secrets          Secrets?
   resumes          Resume[]
+
+  // Fields for single-user custom domain feature
+  customDomain         String? @unique
+  customDomainResumeId String?
 }
 
 model Secrets {

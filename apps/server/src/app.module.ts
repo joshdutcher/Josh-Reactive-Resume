@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { HttpException, Module } from "@nestjs/common";
+import { HttpException, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { RavenInterceptor, RavenModule } from "nest-raven";
@@ -18,6 +18,8 @@ import { ResumeModule } from "./resume/resume.module";
 import { StorageModule } from "./storage/storage.module";
 import { TranslationModule } from "./translation/translation.module";
 import { UserModule } from "./user/user.module";
+import { DomainModule } from "./domain/domain.module";
+import { CustomDomainMiddleware } from "./domain/middleware/custom-domain.middleware";
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { UserModule } from "./user/user.module";
     FeatureModule,
     TranslationModule,
     ContributorsModule,
+    DomainModule,
 
     // Static Assets
     ServeStaticModule.forRoot({
@@ -69,4 +72,8 @@ import { UserModule } from "./user/user.module";
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CustomDomainMiddleware).forRoutes("*");
+  }
+}

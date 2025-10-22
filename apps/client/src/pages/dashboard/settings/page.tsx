@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 
 import { AccountSettings } from "./_sections/account";
+import { DomainSettings } from "./_sections/domain";
 import { DangerZoneSettings } from "./_sections/danger";
 import { OpenAISettings } from "./_sections/openai";
 import { ProfileSettings } from "./_sections/profile";
@@ -29,6 +30,8 @@ export const SettingsPage = () => (
       <ScrollArea hideScrollbar className="h-[calc(100vh-140px)] lg:h-[calc(100vh-88px)]">
         <div className="space-y-6">
           <AccountSettings />
+          <Separator />
+          <DomainSettings />
           <Separator />
           <SecuritySettings />
           <Separator />

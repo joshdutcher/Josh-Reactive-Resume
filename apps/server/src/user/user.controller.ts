@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { UpdateUserDto, UserDto } from "@reactive-resume/dto";
+import { UpdateUserDto, UserDto, UpdateDomainDto } from "@reactive-resume/dto";
 import { ErrorMessage } from "@reactive-resume/utils";
 import type { Response } from "express";
 
@@ -60,6 +60,24 @@ export class UserController {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
         throw new BadRequestException(ErrorMessage.UserAlreadyExists);
+      }
+
+      Logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  @Patch("domain")
+  @UseGuards(TwoFactorGuard)
+  async updateDomain(@User("id") id: string, @Body() updateDomainDto: UpdateDomainDto) {
+    try {
+      return await this.userService.updateDomain(id, {
+        customDomain: updateDomainDto.domain,
+        customDomainResumeId: updateDomainDto.resumeId,
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new BadRequestException("The domain is already in use.");
       }
 
       Logger.error(error);

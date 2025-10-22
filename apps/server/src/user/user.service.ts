@@ -78,6 +78,10 @@ export class UserService {
     return this.prisma.user.update({ where: { email }, data });
   }
 
+  updateDomain(id: string, data: { customDomain?: string; customDomainResumeId?: string }): Promise<User> {
+    return this.prisma.user.update({ where: { id }, data });
+  }
+
   async updateByResetToken(
     resetToken: string,
     data: Prisma.SecretsUpdateArgs["data"],
