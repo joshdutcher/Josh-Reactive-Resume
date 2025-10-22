@@ -34,6 +34,8 @@
 
 ### 3. Documentation
 
-- [ ] **Write User Guide:**
-  - Create a new Markdown file in a `docs` folder or update the `README.md`.
-  - The guide will explain the feature and provide step-by-step instructions for self-hosters on how to configure their hosting provider and the application.
+- [x] **Write User Guide:**
+  - ✅ Created comprehensive guide at `docs/CUSTOM_DOMAIN_GUIDE.md`
+  - ✅ Updated in-app UI with step-by-step instructions
+  - ✅ Added link to full documentation from settings page
+  - The guide explains DNS configuration, Railway setup, and troubleshooting

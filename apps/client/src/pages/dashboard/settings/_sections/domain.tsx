@@ -47,6 +47,18 @@ export const DomainSettings = () => {
         <p className="leading-relaxed opacity-75">
           {t`You can map a custom domain to one of your resumes. This feature is only available for self-hosted instances.`}
         </p>
+        <div className="mt-4 space-y-2 text-sm opacity-75">
+          <p className="font-semibold">{t`Setup Instructions:`}</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>{t`Add your domain in Railway dashboard under Custom Domains`}</li>
+            <li>{t`Configure DNS CNAME record to point to your Railway domain`}</li>
+            <li>{t`Enter your domain and select target resume below`}</li>
+            <li>{t`Wait for DNS propagation (5-60 minutes)`}</li>
+          </ol>
+          <p className="mt-2">
+            {t`Full guide:`} <a href="https://github.com/joshdutcher/Josh-Reactive-Resume/blob/main/docs/CUSTOM_DOMAIN_GUIDE.md" target="_blank" rel="noopener noreferrer" className="text-primary underline">Custom Domain Setup Guide</a>
+          </p>
+        </div>
       </div>
 
       <Form {...form}>
