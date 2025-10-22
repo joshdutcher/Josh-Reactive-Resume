@@ -8,17 +8,22 @@
 - [x] Secrets generated (see below)
 - [x] Documentation prepared
 
-## 🎯 Your Generated Secrets
+## 🎯 Generate Secrets
 
-**IMPORTANT**: Save these secrets - they won't be shown again!
+**IMPORTANT**: Generate secure secrets for your deployment using these commands:
 
+```bash
+# Generate ACCESS_TOKEN_SECRET
+openssl rand -base64 64
+
+# Generate REFRESH_TOKEN_SECRET
+openssl rand -base64 64
+
+# Generate CHROME_TOKEN
+openssl rand -hex 32
 ```
-ACCESS_TOKEN_SECRET=ZFHI+l+ebZGbb3dyXfa6z6BdVSrmrOU0AmekiCux9ATHxVlbtiGrmsw2JesALaV2meEEO6/MifWvg1vUAYnggg==
 
-REFRESH_TOKEN_SECRET=ol5rcsNlW/ZABsEwd45toBZUO6Zlh1qVt28FFNmxrglX4aAOIU+OdwbsYPpVkFgYFXNcXuk7aMr4yiaW+FoC7g==
-
-CHROME_TOKEN=b9d7e3cf8d19b87cc9dc2bdd2907c7e276363318581d9c375cdd6233a328a4cf
-```
+Save these generated values - you'll need them for the environment variables below.
 
 ## 📋 Complete These Steps in Railway Dashboard
 
@@ -46,8 +51,8 @@ Click on your app service → **"Variables"** tab → Add these:
 ```
 NODE_ENV=production
 PORT=3000
-ACCESS_TOKEN_SECRET=ZFHI+l+ebZGbb3dyXfa6z6BdVSrmrOU0AmekiCux9ATHxVlbtiGrmsw2JesALaV2meEEO6/MifWvg1vUAYnggg==
-REFRESH_TOKEN_SECRET=ol5rcsNlW/ZABsEwd45toBZUO6Zlh1qVt28FFNmxrglX4aAOIU+OdwbsYPpVkFgYFXNcXuk7aMr4yiaW+FoC7g==
+ACCESS_TOKEN_SECRET=[paste-generated-secret-from-above]
+REFRESH_TOKEN_SECRET=[paste-generated-secret-from-above]
 MAIL_FROM=noreply@railway.app
 ```
 
@@ -93,9 +98,13 @@ PUBLIC_URL=https://[your-app].up.railway.app
 3. Deploy template
 4. Note the service name and add to app:
    ```
-   CHROME_TOKEN=b9d7e3cf8d19b87cc9dc2bdd2907c7e276363318581d9c375cdd6233a328a4cf
+   CHROME_TOKEN=[paste-generated-token-from-above]
    CHROME_URL=ws://[chrome-service-name].railway.internal:3000
    CHROME_IGNORE_HTTPS_ERRORS=true
+   ```
+5. **IMPORTANT**: Also add the same token to the Chrome service:
+   ```
+   TOKEN=[same-token-as-above]
    ```
 
 **Option B: Use External Browserless.io (Paid)**
