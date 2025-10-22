@@ -56,6 +56,12 @@ REFRESH_TOKEN_SECRET=[paste-generated-secret-from-above]
 MAIL_FROM=noreply@railway.app
 ```
 
+**CRITICAL - Railway will auto-populate this from PostgreSQL**:
+```
+DATABASE_URL=[auto-populated-by-railway]
+```
+⚠️ **Note**: Railway automatically adds `DATABASE_URL` when you add PostgreSQL. If missing, the build will fail with "Environment variable not found: DATABASE_URL" error.
+
 **After app deploys and Railway generates a domain**:
 ```
 PUBLIC_URL=https://[your-app].up.railway.app

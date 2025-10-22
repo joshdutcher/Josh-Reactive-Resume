@@ -41,6 +41,12 @@ The official documentation includes:
 - Nx monorepo with pnpm workspaces
 - Docker for containerization
 - Vitest for testing
+- Railway for deployment and hosting
+- GitHub for version control and CI/CD
+
+**Available CLI Tools:**
+- `railway` - Railway CLI for deployment management, logs, and service configuration
+- `gh` - GitHub CLI for repository operations, PR management, and issue tracking
 
 ## Monorepo Structure
 
