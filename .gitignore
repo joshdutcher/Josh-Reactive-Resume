@@ -54,3 +54,6 @@ apps/client/src/locales/*/messages.*js
 
 # Railway Configuration with Secrets
 .railway/QUICKSTART.md
+
+# Local Files (examples, test data, etc.)
+.local/

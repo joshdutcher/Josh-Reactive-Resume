@@ -1,4 +1,40 @@
+# SESSION.md - Current Session State
+
+## Current Session - 2025-10-23
+**Status**: Complete
+**Focus**: Fixed custom domain metadata error with defensive programming
+
+### Session Context
+- Custom domain feature previously implemented and deployed to Railway
+- Resolved production error: `Cannot read properties of undefined (reading 'metadata')`
+- Root cause: Database resume data missing expected nested structure
+- Solution: Implemented defensive programming with schema-based fallback defaults
+
+### Session Accomplishments
+- ✅ Validated schema against upstream (no drift)
+- ✅ Organized local test data in `.local/` folder (gitignored)
+- ✅ Documented production-only testing policy
+- ✅ Fixed client-side null safety with optional chaining and defaults
+- ✅ Fixed server-side data validation with schema-based merging
+- ✅ Ready for Railway deployment
+
+### Key Learnings
+- Prisma's Json type doesn't enforce runtime schema validation
+- Need defensive checks when querying resume data from database
+- Schema defaults can be imported and used for data normalization
+- Production testing via Railway is faster than local dev setup
+
+---
+
 # Custom Domain Feature for Self-Hosting
+
+## Development Practices
+
+**Production-Only Testing**: We do NOT run local dev servers for this project.
+- **Why**: Requires complex local setup (PostgreSQL, Minio, Browserless/Chrome)
+- **Testing Strategy**: All testing done in Railway production deployment
+- **Debugging**: Use `railway logs` command and Railway dashboard
+- **Database Queries**: Access via Railway dashboard or `railway run` commands
 
 ## Objective
 
@@ -18,6 +54,7 @@ The implementation will offload the complex parts of domain management (network 
 
 ## Key Implementation Points
 
-*   **Database:** The `User` model in `prisma.schema` will be updated to store the custom domain and the ID of the target resume.
-*   **Backend:** A new middleware will be introduced to inspect the `Host` header and serve the appropriate resume. A new API endpoint will be created to allow the user to update their custom domain settings from the frontend.
-*   **Frontend:** New UI components will be added to the user settings page and the resume "Share" dialog to manage the feature.
+*   **Database:** The `User` model in `prisma.schema` stores the custom domain and the ID of the target resume.
+*   **Backend:** Middleware inspects the `Host` header and serves the appropriate resume. API endpoint allows users to update custom domain settings.
+*   **Frontend:** UI components in user settings page and resume "Share" dialog manage the feature.
+*   **Data Validation:** Server-side data normalization ensures resume data has required metadata structure using schema defaults.

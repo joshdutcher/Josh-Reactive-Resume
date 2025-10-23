@@ -32,7 +32,18 @@ export const CustomDomainPage = () => {
   }
 
   const { id, title, data: resume } = resumeData;
-  const format = resume.metadata.page.format as keyof typeof pageSizeMap;
+
+  // Defensive check: ensure resume data has the required nested structure
+  // If metadata.page is missing, use sensible defaults to prevent crashes
+  if (!resume?.metadata?.page) {
+    console.warn("Resume data missing metadata.page structure, using defaults", {
+      id,
+      hasResume: !!resume,
+      hasMetadata: !!resume?.metadata,
+    });
+  }
+
+  const format = (resume?.metadata?.page?.format ?? "a4") as keyof typeof pageSizeMap;
 
   const updateResumeInFrame = useCallback(() => {
     const message = { type: "SET_RESUME", payload: resume };
