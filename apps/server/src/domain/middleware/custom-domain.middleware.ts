@@ -10,7 +10,7 @@ export class CustomDomainMiddleware implements NestMiddleware {
     private readonly configService: ConfigService,
   ) {}
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: Request & { customDomain?: { hostname: string; userId: string; resumeId: string } }, res: Response, next: NextFunction) {
     const host = req.hostname;
     const publicUrl = this.configService.get<string>("PUBLIC_URL");
 
@@ -26,22 +26,20 @@ export class CustomDomainMiddleware implements NestMiddleware {
     try {
       const user = await this.prisma.user.findUnique({
         where: { customDomain: host },
-        include: { resumes: true },
       });
 
       if (!user || !user.customDomainResumeId) {
         return next();
       }
 
-      const resume = user.resumes.find((r) => r.id === user.customDomainResumeId);
+      // Store the custom domain info in the request for the controller to use
+      req.customDomain = {
+        hostname: host,
+        userId: user.id,
+        resumeId: user.customDomainResumeId,
+      };
 
-      if (!resume) {
-        return next();
-      }
-
-      // Redirect to the public resume page
-      const redirectUrl = `${publicUrl}/${user.username}/${resume.slug}`;
-      return res.redirect(302, redirectUrl);
+      return next();
     } catch (error) {
       // If there's an error, just continue with the normal flow
       return next();

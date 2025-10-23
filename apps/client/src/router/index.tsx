@@ -10,6 +10,7 @@ import { VerifyEmailPage } from "../pages/auth/verify-email/page";
 import { VerifyOtpPage } from "../pages/auth/verify-otp/page";
 import { BuilderLayout } from "../pages/builder/layout";
 import { builderLoader, BuilderPage } from "../pages/builder/page";
+import { customDomainLoader, CustomDomainPage } from "../pages/custom-domain/page";
 import { DashboardLayout } from "../pages/dashboard/layout";
 import { ResumesPage } from "../pages/dashboard/resumes/page";
 import { SettingsPage } from "../pages/dashboard/settings/page";
@@ -25,8 +26,11 @@ import { authLoader } from "./loaders/auth";
 export const routes = createRoutesFromElements(
   <Route element={<Providers />}>
     <Route errorElement={<ErrorPage />}>
+      {/* Custom domain route - this will catch the root path on custom domains */}
+      <Route path="/" loader={customDomainLoader} element={<CustomDomainPage />} />
+
       <Route element={<HomeLayout />}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
       </Route>
 
       <Route path="auth">
