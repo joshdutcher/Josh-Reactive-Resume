@@ -21,7 +21,6 @@ export const SharingSection = () => {
 
   // Constants
   const url = `${window.location.origin}/${username}/${slug}`;
-  const railwayDomain = "7tqgqcqr.up.railway.app";
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(url);
@@ -105,14 +104,6 @@ export const SharingSection = () => {
                 onChange={(e) => setValue("customDomain", e.target.value || null)}
                 className="flex-1"
               />
-
-              <p className="text-xs opacity-60">
-                Add a CNAME record in your DNS settings pointing to{" "}
-                <code className="rounded bg-secondary px-1 py-0.5 font-mono text-xs">
-                  {railwayDomain}
-                </code>
-                , then enter your custom domain here.
-              </p>
             </motion.div>
           )}
         </AnimatePresence>

@@ -24,7 +24,6 @@ const isCustomDomain = () => {
   const mainDomains = [
     "localhost",
     "josh-reactive-resume-production.up.railway.app",
-    "7tqgqcqr.up.railway.app",
   ];
 
   return !mainDomains.some((domain) => hostname.includes(domain));
