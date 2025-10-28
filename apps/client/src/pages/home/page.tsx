@@ -31,10 +31,10 @@ const isCustomDomain = () => {
 
 export const HomePage = () => {
   const { i18n } = useLingui();
-  const data = useLoaderData() as { isCustomDomain: boolean; resume?: ResumeDto } | null;
+  const data = useLoaderData() as ResumeDto | null;
 
-  // If this is a custom domain with a resume, render the public resume page
-  if (data?.isCustomDomain && data.resume) {
+  // If data is a ResumeDto (custom domain with resume found), render public resume page
+  if (data && 'id' in data && 'data' in data) {
     return <PublicResumePage />;
   }
 
@@ -74,12 +74,13 @@ export const homeLoader: LoaderFunction = async () => {
         queryFn: () => findResumeByCustomDomain(),
       });
 
-      return { isCustomDomain: true, resume };
+      // Return resume directly for consistency with publicLoader
+      return resume;
     } catch {
       // Custom domain configured but resume not found - show home page
-      return { isCustomDomain: false };
+      return null;
     }
   }
 
-  return { isCustomDomain: false };
+  return null;
 };
