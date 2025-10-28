@@ -16,10 +16,12 @@ export const SharingSection = () => {
 
   const setValue = useResumeStore((state) => state.setValue);
   const slug = useResumeStore((state) => state.resume.slug);
+  const customDomain = useResumeStore((state) => state.resume.customDomain);
   const isPublic = useResumeStore((state) => state.resume.visibility === "public");
 
   // Constants
   const url = `${window.location.origin}/${username}/${slug}`;
+  const railwayDomain = "7tqgqcqr.up.railway.app";
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(url);
@@ -81,6 +83,36 @@ export const SharingSection = () => {
                   </Button>
                 </Tooltip>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence presenceAffectsLayout>
+          {isPublic && (
+            <motion.div
+              layout
+              className="space-y-1.5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Label htmlFor="custom-domain">{t`Custom Domain (Optional)`}</Label>
+
+              <Input
+                id="custom-domain"
+                value={customDomain || ""}
+                placeholder="resume.yourdomain.com"
+                onChange={(e) => setValue("customDomain", e.target.value || null)}
+                className="flex-1"
+              />
+
+              <p className="text-xs opacity-60">
+                {t`Add a CNAME record in your DNS settings pointing to`}{" "}
+                <code className="rounded bg-secondary px-1 py-0.5 font-mono text-xs">
+                  {railwayDomain}
+                </code>
+                {t`, then enter your custom domain here.`}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>

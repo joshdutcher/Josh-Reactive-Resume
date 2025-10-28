@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   InternalServerErrorException,
   Logger,
   Param,
@@ -100,6 +101,17 @@ export class ResumeController {
     @User("id") userId: string,
   ) {
     const resume = await this.resumeService.findOneByUsernameSlug(username, slug, userId);
+
+    // Hide private notes from public resume API responses
+    set(resume.data as ResumeData, "metadata.notes", undefined);
+
+    return resume;
+  }
+
+  @Get("/public/by-domain")
+  @UseGuards(OptionalGuard)
+  async findOneByCustomDomain(@Headers("host") host: string, @User("id") userId: string) {
+    const resume = await this.resumeService.findOneByCustomDomain(host, userId);
 
     // Hide private notes from public resume API responses
     set(resume.data as ResumeData, "metadata.notes", undefined);

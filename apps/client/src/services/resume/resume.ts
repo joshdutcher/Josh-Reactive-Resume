@@ -13,3 +13,9 @@ export const findResumeByUsernameSlug = async (data: { username: string; slug: s
 
   return response.data;
 };
+
+export const findResumeByCustomDomain = async () => {
+  const response = await axios.get<ResumeDto>("/resume/public/by-domain");
+
+  return response.data;
+};

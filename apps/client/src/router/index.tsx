@@ -14,7 +14,7 @@ import { DashboardLayout } from "../pages/dashboard/layout";
 import { ResumesPage } from "../pages/dashboard/resumes/page";
 import { SettingsPage } from "../pages/dashboard/settings/page";
 import { HomeLayout } from "../pages/home/layout";
-import { HomePage } from "../pages/home/page";
+import { homeLoader, HomePage } from "../pages/home/page";
 import { ErrorPage } from "../pages/public/error";
 import { publicLoader, PublicResumePage } from "../pages/public/page";
 import { Providers } from "../providers";
@@ -26,7 +26,7 @@ export const routes = createRoutesFromElements(
   <Route element={<Providers />}>
     <Route errorElement={<ErrorPage />}>
       <Route element={<HomeLayout />}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" loader={homeLoader} element={<HomePage />} />
       </Route>
 
       <Route path="auth">

@@ -101,6 +101,23 @@ export class ResumeService {
     return resume;
   }
 
+  async findOneByCustomDomain(customDomain: string, userId?: string) {
+    const resume = await this.prisma.resume.findFirstOrThrow({
+      where: { customDomain, visibility: "public" },
+    });
+
+    // Update statistics: increment the number of views by 1
+    if (!userId) {
+      await this.prisma.statistics.upsert({
+        where: { resumeId: resume.id },
+        create: { views: 1, downloads: 0, resumeId: resume.id },
+        update: { views: { increment: 1 } },
+      });
+    }
+
+    return resume;
+  }
+
   async update(userId: string, id: string, updateResumeDto: UpdateResumeDto) {
     try {
       const { locked } = await this.prisma.resume.findUniqueOrThrow({
@@ -115,6 +132,7 @@ export class ResumeService {
           title: updateResumeDto.title,
           slug: updateResumeDto.slug,
           visibility: updateResumeDto.visibility,
+          customDomain: updateResumeDto.customDomain,
           data: updateResumeDto.data as Prisma.JsonObject,
         },
         where: { userId_id: { userId, id } },

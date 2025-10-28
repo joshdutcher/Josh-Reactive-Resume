@@ -33,6 +33,8 @@ export const useResumeStore = create<ResumeStore>()(
         set((state) => {
           if (path === "visibility") {
             state.resume.visibility = value as "public" | "private";
+          } else if (path === "customDomain") {
+            state.resume.customDomain = value as string | null;
           } else {
             state.resume.data = _set(state.resume.data, path, value);
           }
