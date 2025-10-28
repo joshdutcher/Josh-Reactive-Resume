@@ -96,7 +96,7 @@ export const SharingSection = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <Label htmlFor="custom-domain">{t`Custom Domain (Optional)`}</Label>
+              <Label htmlFor="custom-domain">Custom Domain (Optional)</Label>
 
               <Input
                 id="custom-domain"
@@ -107,11 +107,11 @@ export const SharingSection = () => {
               />
 
               <p className="text-xs opacity-60">
-                {t`Add a CNAME record in your DNS settings pointing to`}{" "}
+                Add a CNAME record in your DNS settings pointing to{" "}
                 <code className="rounded bg-secondary px-1 py-0.5 font-mono text-xs">
                   {railwayDomain}
                 </code>
-                {t`, then enter your custom domain here.`}
+                , then enter your custom domain here.
               </p>
             </motion.div>
           )}
