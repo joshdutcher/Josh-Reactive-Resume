@@ -1,8 +1,11 @@
 # SESSION.md - Current Session State
 
-## Current Session - 2025-10-28
-**Status**: Complete - Custom Domain Feature Implemented
-**Focus**: Custom domain support for public resumes
+## Current Session - 2025-10-30
+**Status**: Complete - Custom Domain Feature Implemented & Fixed
+**Focus**: Custom domain support for public resumes with metadata error resolution
+
+### Session Context
+Custom domain feature implementation completed in previous session (2025-10-28). Current session addressed post-implementation bug fix and documentation update.
 
 ### Session Accomplishments
 
@@ -16,57 +19,35 @@
 5. ✅ Auto-save functionality integrated with existing resume store
 6. ✅ i18n issues resolved (removed translation macros)
 7. ✅ CNAME instructions removed (simplified UX)
+8. ✅ **NEW**: Metadata error fixed - normalized data structure in homeLoader
 
-### Technical Implementation
+### Bug Fix - Metadata Error Resolution
 
-**Database** (`tools/prisma/schema.prisma`):
-- Added `customDomain String? @unique` to Resume model
-- Migration created and applied successfully
+**Issue**: Runtime error when accessing resumes via custom domains
+- Error: `"Cannot read properties of undefined (reading 'metadata')"`
+- Root Cause: Data structure mismatch between homeLoader and PublicResumePage
+- homeLoader returned `{ isCustomDomain: boolean, resume: ResumeDto }`
+- PublicResumePage expected `ResumeDto` directly
 
-**Backend** (`apps/server/src/resume/`):
-- `findOneByCustomDomain()` service method using Host header
-- `GET /api/resume/public/by-domain` controller endpoint
-- Updated `update()` to handle customDomain field
-
-**Frontend** (`apps/client/src/`):
-- Custom domain input field in Sharing section
-- `findResumeByCustomDomain()` API client method
-- Resume store integration with auto-save (500ms debounce)
-- Custom domain detection in `homeLoader()`
-- Conditional rendering of PublicResumePage for custom domains
+**Solution** (commit `aab753e7`):
+- Modified homeLoader to return `ResumeDto | null` directly for custom domains
+- Updated HomePage to detect ResumeDto using property checking ('id' and 'data')
+- Normalized custom domain routing to match standard public URL pattern
+- Maintained backward compatibility with standard routes
 
 ### Git History
 
-**3 commits created**:
+**5 commits created**:
 1. `6007f680` - Add custom domain support for public resumes
 2. `896596f1` - Fix: Remove i18n macros from custom domain section
 3. `341fecf5` - Refactor: Remove CNAME instructions from custom domain field
-
-**Changes Summary**: 10 files changed, 122 insertions(+), 13 deletions(-)
-
-### Design Decisions
-
-**Minimized Upstream Divergence**:
-- Only added necessary fields and endpoints
-- No modifications to existing resume serving behavior
-- Main domain functionality preserved
-
-**User Experience**:
-- Simple "Custom Domain (Optional)" text field
-- Auto-save on input change (consistent with app patterns)
-- No explicit save button (matches existing UX)
-- DNS configuration left to user (Railway limitations)
-
-**Technical Constraints**:
-- Railway provides no API for domain management
-- CNAME target cannot be retrieved programmatically
-- DNS validation not implemented (Railway limitations)
-- Hard-coded domain detection for main domains only
+4. `ef1f640c` - Docs: Update SESSION.md with custom domain implementation summary
+5. `aab753e7` - Fix: Resolve custom domain metadata error by normalizing data structure
 
 ### Current State
 
-- **Branch**: main (3 commits ahead of session start)
+- **Branch**: main (5 commits ahead of upstream)
+- **Divergence**: upstream/main has 12 new commits
 - **Build Status**: ✅ All builds passing
 - **Type Safety**: ✅ No TypeScript errors
-- **Pushed to**: origin/main
-- **Session Status**: Ready for deployment and testing
+- **Feature Status**: ✅ Fully functional with bug fix applied
