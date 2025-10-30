@@ -1,70 +1,119 @@
 # SESSION.md - Current Session State
 
 ## Current Session - 2025-10-30
-**Status**: Complete - Custom Domain Feature Implemented & Fixed
-**Focus**: Custom domain support for public resumes with metadata error resolution
+**Status**: Complete - Donation Banner Enhancement
+**Focus**: Hide donation banner on custom domains for cleaner resume presentation
 
 ### Session Context
-Custom domain feature implementation completed in previous session (2025-10-28). Current session addressed post-implementation bug fix and documentation update.
+Built upon previous custom domain implementation (2025-10-28) to enhance user experience when accessing resumes via personal domains.
 
 ### Session Accomplishments
 
-**Feature Implemented**: Custom domain functionality allowing users to serve public resumes via custom domains (e.g., `test.joshsresume.com`) without redirects.
+**Feature**: Donation Banner Customization
+- Hide donation banner when resumes accessed via custom domains
+- Maintain banner visibility on main site (localhost, production)
+- Provide cleaner, more professional appearance for custom domain users
 
-**Core Changes**:
-1. ✅ Database schema updated with `customDomain` field (optional String, unique constraint)
-2. ✅ Backend API endpoints created for custom domain resolution
-3. ✅ Frontend UI added in Sharing section for domain input
-4. ✅ Custom domain routing and detection implemented
-5. ✅ Auto-save functionality integrated with existing resume store
-6. ✅ i18n issues resolved (removed translation macros)
-7. ✅ CNAME instructions removed (simplified UX)
-8. ✅ **NEW**: Metadata error fixed - normalized data structure in homeLoader
+**Changes**:
+1. ✅ Added `isCustomDomain()` detection function to donation-banner.tsx
+2. ✅ Implemented conditional rendering based on hostname
+3. ✅ Fixed TypeScript type assertion in page.tsx (useLoaderData)
+4. ✅ Applied prettier formatting for code consistency
+5. ✅ Created comprehensive project documentation (CLAUDE.md)
 
-### Bug Fix - Metadata Error Resolution
+**Files Modified**:
+- `apps/client/src/pages/home/components/donation-banner.tsx` - Custom domain detection + conditional render
+- `apps/client/src/pages/home/page.tsx` - TypeScript improvements, code formatting
+- `.claude/CLAUDE.md` - **NEW**: Comprehensive project documentation with fork status
 
-**Issue**: Runtime error when accessing resumes via custom domains
-- Error: `"Cannot read properties of undefined (reading 'metadata')"`
-- Root Cause: Data structure mismatch between homeLoader and PublicResumePage
-- homeLoader returned `{ isCustomDomain: boolean, resume: ResumeDto }`
-- PublicResumePage expected `ResumeDto` directly
+### Technical Implementation
 
-**Solution** (commit `aab753e7`):
-- Modified homeLoader to return `ResumeDto | null` directly for custom domains
-- Updated HomePage to detect ResumeDto using property checking ('id' and 'data')
-- Normalized custom domain routing to match standard public URL pattern
-- Maintained backward compatibility with standard routes
+**Custom Domain Detection**:
+```typescript
+const isCustomDomain = () => {
+  const hostname = window.location.hostname;
+  const mainDomains = ["localhost", "josh-reactive-resume-production.up.railway.app"];
+  return !mainDomains.some((domain) => hostname.includes(domain));
+};
+```
 
-### Git History
+**Conditional Rendering**:
+- Returns `null` (hidden) when accessed via custom domain
+- Returns full banner component on main site
+- Zero performance impact using early return pattern
 
-**6 commits created**:
-1. `1b79bdf7` - Add custom domain support for public resumes
-2. `d5765683` - Fix: Remove i18n macros from custom domain section
-3. `dc29cb0c` - Refactor: Remove CNAME instructions from custom domain field
-4. `d2bfa0c8` - Docs: Update SESSION.md with custom domain implementation summary
-5. `c456610f` - Fix: Resolve custom domain metadata error by normalizing data structure
-6. `64b355d2` - Docs: Update SESSION.md with metadata fix and current session state
+### Git Activity
 
-### Upstream Sync
+**New Commit**: `8891fb3a` - Feat: Hide donation banner on custom domains
 
-**Rebase Completed**: Successfully rebased 6 custom commits onto upstream/main
+**Commit Details**:
+- 2 files changed, 33 insertions(+), 22 deletions(-)
+- Clean implementation with no side effects
+- Follows project commit message conventions
 
-**Upstream Changes Integrated** (12 commits):
-- Localization updates (te-IN translations via Crowdin)
-- Rich input enhancements (highlight selected options, data state updates)
-- Template fixes (Gengar summary section rendering)
-- Documentation updates (README template additions)
+**Push Status**: ✅ Successfully pushed to origin/main (force-with-lease)
 
-**Merge Result**: Zero conflicts, clean rebase
-- Your changes: Database schema, resume backend/frontend, home page routing
-- Upstream changes: UI components, templates, translations, documentation
-- No overlap in modified files
+### Project Documentation
+
+**New File**: `.claude/CLAUDE.md`
+
+**Contents**:
+- Project overview and fork status documentation
+- **IMPORTANT**: Permanent fork notice - NOT intended for upstream merge
+- Complete custom modifications catalog
+- Tech stack and architecture details
+- Development workflow and sync procedures
+- Known issues and maintenance notes
+
+**Key Documentation Points**:
+- ⚠️ This is a permanent custom fork
+- Custom modifications tracked and documented
+- Upstream sync strategy defined
+- Clear separation of custom vs. upstream changes
+
+### Upstream Relationship
+
+**Sync Strategy**:
+- Periodically sync with upstream/main for bug fixes and features
+- Maintain custom modifications in separate commits
+- **Never** create PRs to upstream for fork-specific changes
+- Document all custom features clearly
+
+**Current Commits Ahead**: 8 commits (7 previous + 1 new)
+1. Custom domain support (4 commits)
+2. Upstream sync documentation (2 commits)
+3. Metadata error fix (1 commit)
+4. Donation banner customization (1 commit - NEW)
 
 ### Current State
 
-- **Branch**: main (6 commits ahead of upstream/main)
-- **Sync Status**: ✅ Rebased onto upstream/main (commit 6fcb7a48)
-- **Build Status**: ✅ All builds passing (9/9 projects)
-- **Lint Status**: ⚠️ Minor upstream issues (jsonc-eslint-parser warnings, 1 prettier warning in gengar.tsx)
-- **Type Safety**: ✅ No TypeScript errors
-- **Feature Status**: ✅ Custom domain fully functional with metadata fix applied
+- **Branch**: main
+- **Status**: 8 commits ahead of upstream/main
+- **Build**: ✅ All 9 projects successful
+- **Lint**: ⚠️ Pre-existing upstream warnings (not blocking)
+- **TypeScript**: ✅ No errors
+- **Git Remote**: ✅ Synced with origin/main
+- **Documentation**: ✅ Comprehensive project docs created
+
+### Features Summary
+
+**Custom Domain Support** (Previous Session):
+- Database field for custom domains
+- Backend resolution API
+- Frontend configuration UI
+- Automatic routing
+
+**Donation Banner Enhancement** (Current Session):
+- Hostname-based detection
+- Conditional banner visibility
+- Professional custom domain appearance
+
+### Next Steps
+
+No immediate action required. System is stable and fully functional.
+
+**Future Considerations**:
+- Monitor upstream for security updates
+- Test features after upstream syncs
+- Consider additional custom domain enhancements
+- Maintain documentation currency
