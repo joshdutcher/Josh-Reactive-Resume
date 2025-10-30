@@ -28,18 +28,37 @@ export class PrinterService {
 
     this.browserURL = `${chromeUrl}?token=${chromeToken}`;
     this.ignoreHTTPSErrors = this.configService.getOrThrow<boolean>("CHROME_IGNORE_HTTPS_ERRORS");
+
+    // Log configuration for debugging
+    this.logger.log(`PrinterService initialized with:`);
+    this.logger.log(`  Chrome URL: ${chromeUrl}`);
+    this.logger.log(`  Browser WebSocket Endpoint: ${this.browserURL}`);
+    this.logger.log(`  Token length: ${chromeToken?.length || 0} characters`);
+    this.logger.log(`  Ignore HTTPS Errors: ${this.ignoreHTTPSErrors}`);
   }
 
   private async getBrowser() {
     try {
-      return await connect({
+      this.logger.debug(`Attempting to connect to browser...`);
+      this.logger.debug(`  WebSocket Endpoint: ${this.browserURL}`);
+      this.logger.debug(`  Accept Insecure Certs: ${this.ignoreHTTPSErrors}`);
+
+      const browser = await connect({
         browserWSEndpoint: this.browserURL,
         acceptInsecureCerts: this.ignoreHTTPSErrors,
       });
+
+      this.logger.debug(`Successfully connected to browser!`);
+      return browser;
     } catch (error) {
+      this.logger.error(`Failed to connect to browser at: ${this.browserURL}`);
+      this.logger.error(`Error type: ${error.constructor.name}`);
+      this.logger.error(`Error message: ${(error as Error).message}`);
+      this.logger.error(`Error stack: ${(error as Error).stack}`);
+
       throw new InternalServerErrorException(
         ErrorMessage.InvalidBrowserConnection,
-        (error as Error).message,
+        `Failed to connect to ${this.browserURL}: ${(error as Error).message}`,
       );
     }
   }
