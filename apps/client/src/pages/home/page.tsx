@@ -21,20 +21,17 @@ import { TestimonialsSection } from "./sections/testimonials";
 
 const isCustomDomain = () => {
   const hostname = window.location.hostname;
-  const mainDomains = [
-    "localhost",
-    "josh-reactive-resume-production.up.railway.app",
-  ];
+  const mainDomains = ["localhost", "josh-reactive-resume-production.up.railway.app"];
 
   return !mainDomains.some((domain) => hostname.includes(domain));
 };
 
 export const HomePage = () => {
   const { i18n } = useLingui();
-  const data = useLoaderData() as ResumeDto | null;
+  const data = useLoaderData<ResumeDto | null>();
 
   // If data is a ResumeDto (custom domain with resume found), render public resume page
-  if (data && 'id' in data && 'data' in data) {
+  if (data && "id" in data && "data" in data) {
     return <PublicResumePage />;
   }
 
