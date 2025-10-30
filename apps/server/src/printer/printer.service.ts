@@ -26,12 +26,16 @@ export class PrinterService {
     const chromeUrl = this.configService.getOrThrow<string>("CHROME_URL");
     const chromeToken = this.configService.getOrThrow<string>("CHROME_TOKEN");
 
-    this.browserURL = `${chromeUrl}?token=${chromeToken}`;
+    // Browserless V2 may need specific WebSocket paths
+    // Try adding trailing slash if not present
+    const normalizedUrl = chromeUrl.endsWith('/') ? chromeUrl : `${chromeUrl}/`;
+    this.browserURL = `${normalizedUrl}?token=${chromeToken}`;
     this.ignoreHTTPSErrors = this.configService.getOrThrow<boolean>("CHROME_IGNORE_HTTPS_ERRORS");
 
     // Log configuration for debugging
     this.logger.log(`PrinterService initialized with:`);
-    this.logger.log(`  Chrome URL: ${chromeUrl}`);
+    this.logger.log(`  Chrome URL (original): ${chromeUrl}`);
+    this.logger.log(`  Chrome URL (normalized): ${normalizedUrl}`);
     this.logger.log(`  Browser WebSocket Endpoint: ${this.browserURL}`);
     this.logger.log(`  Token length: ${chromeToken?.length || 0} characters`);
     this.logger.log(`  Ignore HTTPS Errors: ${this.ignoreHTTPSErrors}`);
