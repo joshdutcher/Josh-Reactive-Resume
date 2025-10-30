@@ -37,17 +37,34 @@ Custom domain feature implementation completed in previous session (2025-10-28).
 
 ### Git History
 
-**5 commits created**:
-1. `6007f680` - Add custom domain support for public resumes
-2. `896596f1` - Fix: Remove i18n macros from custom domain section
-3. `341fecf5` - Refactor: Remove CNAME instructions from custom domain field
-4. `ef1f640c` - Docs: Update SESSION.md with custom domain implementation summary
-5. `aab753e7` - Fix: Resolve custom domain metadata error by normalizing data structure
+**6 commits created**:
+1. `1b79bdf7` - Add custom domain support for public resumes
+2. `d5765683` - Fix: Remove i18n macros from custom domain section
+3. `dc29cb0c` - Refactor: Remove CNAME instructions from custom domain field
+4. `d2bfa0c8` - Docs: Update SESSION.md with custom domain implementation summary
+5. `c456610f` - Fix: Resolve custom domain metadata error by normalizing data structure
+6. `64b355d2` - Docs: Update SESSION.md with metadata fix and current session state
+
+### Upstream Sync
+
+**Rebase Completed**: Successfully rebased 6 custom commits onto upstream/main
+
+**Upstream Changes Integrated** (12 commits):
+- Localization updates (te-IN translations via Crowdin)
+- Rich input enhancements (highlight selected options, data state updates)
+- Template fixes (Gengar summary section rendering)
+- Documentation updates (README template additions)
+
+**Merge Result**: Zero conflicts, clean rebase
+- Your changes: Database schema, resume backend/frontend, home page routing
+- Upstream changes: UI components, templates, translations, documentation
+- No overlap in modified files
 
 ### Current State
 
-- **Branch**: main (5 commits ahead of upstream)
-- **Divergence**: upstream/main has 12 new commits
-- **Build Status**: ✅ All builds passing
+- **Branch**: main (6 commits ahead of upstream/main)
+- **Sync Status**: ✅ Rebased onto upstream/main (commit 6fcb7a48)
+- **Build Status**: ✅ All builds passing (9/9 projects)
+- **Lint Status**: ⚠️ Minor upstream issues (jsonc-eslint-parser warnings, 1 prettier warning in gengar.tsx)
 - **Type Safety**: ✅ No TypeScript errors
-- **Feature Status**: ✅ Fully functional with bug fix applied
+- **Feature Status**: ✅ Custom domain fully functional with metadata fix applied
