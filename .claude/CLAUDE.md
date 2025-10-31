@@ -53,6 +53,21 @@ Hides donation banner when resumes are accessed via custom domains for a cleaner
 - `apps/client/src/pages/home/components/donation-banner.tsx`
 - `apps/client/src/pages/home/page.tsx` (TypeScript improvements)
 
+### 2.5. Footer Cleanup for Custom Domains (2025-10-31)
+**Commits**: `7ea5923f`, `78c4a725`, `a88da54f`
+
+Hides footer section (separator, branding, DigitalOcean badge) when viewing resumes via custom domains, providing a clean professional presentation.
+
+**Changes**:
+- Added custom domain resume detection in Footer component
+- Footer returns `null` when displaying custom domain resume
+- Component-level conditional logic using `useLoaderData`
+- Maintains clean separation and React best practices
+
+**Files Modified**:
+- `apps/client/src/pages/home/components/footer.tsx` - Added detection logic
+- `apps/client/src/pages/home/layout.tsx` - No permanent changes (reverted)
+
 ### 3. MinIO Storage Implementation (2025-10-31)
 **Commit**: `c657c344`
 

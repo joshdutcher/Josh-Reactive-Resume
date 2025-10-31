@@ -1,100 +1,127 @@
 # SESSION.md - Current Session State
 
 ## Current Session - 2025-10-31
-**Status**: Complete - MinIO Storage Implementation
-**Focus**: Fix PDF generation and download by migrating from Cloudflare R2 to MinIO
+**Status**: Complete - Custom Domain Footer Cleanup
+**Focus**: Hide footer section when viewing resumes via custom domains
 
 ### Session Context
-Resumed interrupted session where PDF generation was failing with Cloudflare R2 authorization errors. Successfully diagnosed and resolved by deploying MinIO on Railway.
+User reported that when accessing resumes via custom domain, the footer section (separator + DigitalOcean badge + privacy policy links) appeared below the "Built with Reactive Resume" text, creating a cluttered appearance. The goal was to achieve a clean presentation with only the resume content and minimal branding.
 
 ### Session Accomplishments
 
-**Problem Solved**: PDF Download Authorization Errors
-- Cloudflare R2 doesn't support S3's `setBucketPolicy()` API
-- PDF uploads succeeded but downloads failed with XML authorization errors
-- Storage service couldn't set public bucket access policy
+**Problem Identified**: Footer Rendering on Custom Domains
+- Custom domain resumes displayed via `HomePage` → `PublicResumePage` within `HomeLayout`
+- `HomeLayout` always rendered `Header` and `Footer` components
+- Footer included separator, logo, description, DigitalOcean badge, and theme switches
+- Resulted in non-professional appearance on custom domains
 
-**Solution Implemented**: MinIO Deployment
-- Deployed MinIO service on Railway (S3-compatible storage)
-- MinIO supports full S3 API including bucket policies
-- Updated all storage environment variables
-- PDF generation and downloads now working correctly
+**Solution Implemented**: Component-Level Conditional Rendering
+- Moved custom domain detection logic into `Footer` component itself
+- Footer checks loader data and returns `null` when displaying custom domain resume
+- Maintains clean separation of concerns and React best practices
+- Header remains visible but with invisible logo (existing behavior)
+
+**Implementation Journey**:
+1. ❌ First attempt: Conditional rendering in `HomeLayout` (only footer hidden)
+2. ❌ Second attempt: Hide both header and footer in layout (caused infinite loading)
+3. ✅ Final solution: Footer self-detects and returns null (works correctly)
 
 **Changes**:
-1. ✅ Analyzed codebase storage configuration (no Cloudflare-specific code)
-2. ✅ Created comprehensive MinIO setup guide
-3. ✅ Deployed MinIO service on Railway with public domain
-4. ✅ Updated 8 storage environment variables on Reactive Resume service
-5. ✅ Tested PDF generation - successful download
-6. ✅ Updated project documentation with infrastructure details
-
-**Files Added**:
-- `.claude/MINIO_SETUP.md` - Complete MinIO deployment guide for Railway
+- Modified `Footer` component to detect custom domain resumes via `useLoaderData`
+- Added early return `null` when `isCustomDomainResume` is true
+- Reverted layout to original simple structure
+- No changes to routing or data flow
 
 **Files Modified**:
-- `.claude/CLAUDE.md` - Added MinIO implementation section, infrastructure details
+- `apps/client/src/pages/home/components/footer.tsx` - Added custom domain detection
+- `apps/client/src/pages/home/layout.tsx` - Reverted to original structure
 
 ### Technical Implementation
 
-**Railway Infrastructure**:
-```yaml
-MinIO Service:
-  Image: minio/minio:latest
-  Environment:
-    MINIO_ROOT_USER: minioadmin
-    MINIO_ROOT_PASSWORD: minioadmin123
-  Ports: 9000 (API), 9001 (console)
-  Public Domain: Generated
+**Detection Logic**:
+```typescript
+const data = useLoaderData<ResumeDto | null>();
+const isCustomDomainResume = data && "id" in data && "data" in data;
 
-Reactive Resume Service:
-  Storage Variables:
-    STORAGE_ENDPOINT: minio.railway.internal
-    STORAGE_PORT: 9000
-    STORAGE_URL: https://<minio-domain>.railway.app/josh-reactive-resume
-    STORAGE_BUCKET: josh-reactive-resume
-    STORAGE_USE_SSL: false
+if (isCustomDomainResume) {
+  return null;
+}
 ```
 
-**Storage Architecture**:
-- Internal API: Service-to-service via `minio.railway.internal:9000`
-- Public Downloads: Browser access via MinIO public domain
-- Bucket Policy: Automatic public read access for user content
-- Zero code changes required (configuration only)
+**Rendering Path**:
+```
+Custom Domain → homeLoader (fetches resume) → HomeLayout:
+  - Header (logo invisible via existing logic)
+  - HomePage → PublicResumePage (resume content)
+  - Footer (returns null, doesn't render)
+```
+
+**Why This Approach Works**:
+- Footer has access to route loader data via React Router context
+- Component-level logic keeps conditional rendering localized
+- No layout structure changes that could affect React rendering
+- Maintains compatibility with existing custom domain detection
 
 ### Git Activity
 
-**New Commit**: `c657c344` - Docs: Add MinIO storage implementation documentation
+**Commits**:
+1. `7ea5923f` - Fix: Hide footer when viewing resumes via custom domains (incomplete)
+2. `78c4a725` - Fix: Also hide header when viewing resumes via custom domains (broken)
+3. `a88da54f` - Fix: Move custom domain footer detection to Footer component (working)
 
-**Commit Details**:
-- 2 files changed, 272 insertions(+), 3 deletions(-)
-- Added comprehensive MINIO_SETUP.md guide
-- Updated CLAUDE.md with infrastructure architecture
-- Clean documentation-only commit
+**Final Commit**: `a88da54f`
+- 2 files changed, 25 insertions(+), 21 deletions(-)
+- Clean implementation with proper conditional logic
+- Reverted problematic layout changes
 
 **Push Status**: ✅ Successfully pushed to origin/main
 
 ### Current State
 
 - **Branch**: main
-- **Status**: 13 commits ahead of upstream/main
-- **Build**: ✅ All services operational
-- **PDF Generation**: ✅ Working correctly
-- **Storage**: ✅ MinIO deployed and functional
+- **Status**: 16 commits ahead of upstream/main
+- **Custom Domain Display**: ✅ Clean presentation without footer
+- **Main Site Display**: ✅ Footer renders normally
 - **Git Remote**: ✅ Synced with origin/main
-- **Documentation**: ✅ Complete setup guides available
 
-### Testing Results
+### Expected Behavior After Deploy
 
-✅ **PDF Generation**: Successfully generates PDFs via Browserless
-✅ **PDF Upload**: Files uploaded to MinIO without errors
-✅ **PDF Download**: Browser downloads work correctly
-✅ **Custom Domains**: PDF access works via custom domains
+**Custom Domain View**:
+- Resume content (iframe)
+- "Built with Reactive Resume" link
+- PDF download button (fixed position)
+- Theme switch (fixed position)
+- NO header visible elements
+- NO footer section
+
+**Main Site View** (localhost/production):
+- Full header with logo and donation banner
+- Home page content sections
+- Complete footer with branding and links
+
+### Testing Checklist
+
+After Railway deployment:
+- [ ] Visit resume via custom domain
+- [ ] Verify no footer section appears
+- [ ] Verify "Built with Reactive Resume" link still shows
+- [ ] Verify PDF download and theme switch work
+- [ ] Visit main site and verify footer still appears
+- [ ] Test on multiple custom domains if configured
+
+### Lessons Learned
+
+1. **Component-level logic preferred**: Conditional rendering works best at component level
+2. **Layout changes risky**: Modifying layout structure can cause rendering issues
+3. **Loader data access**: All components in route tree have access via `useLoaderData`
+4. **Testing importance**: Deploy and test each approach before committing next change
 
 ### Next Steps
 
-No immediate action required. System is fully operational.
+No immediate action required. Monitor deployment and user feedback.
 
-**Maintenance**:
-- Monitor MinIO storage usage and performance
-- Verify PDF generation continues working after deployments
-- Consider MinIO backup/persistence strategy if needed
+**If Issues Occur**:
+- Check browser console for React errors
+- Verify Railway environment variables unchanged
+- Test with cache cleared and hard reload
+- Consider adding explicit logging to Footer component
