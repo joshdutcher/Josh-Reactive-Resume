@@ -1,119 +1,100 @@
 # SESSION.md - Current Session State
 
-## Current Session - 2025-10-30
-**Status**: Complete - Donation Banner Enhancement
-**Focus**: Hide donation banner on custom domains for cleaner resume presentation
+## Current Session - 2025-10-31
+**Status**: Complete - MinIO Storage Implementation
+**Focus**: Fix PDF generation and download by migrating from Cloudflare R2 to MinIO
 
 ### Session Context
-Built upon previous custom domain implementation (2025-10-28) to enhance user experience when accessing resumes via personal domains.
+Resumed interrupted session where PDF generation was failing with Cloudflare R2 authorization errors. Successfully diagnosed and resolved by deploying MinIO on Railway.
 
 ### Session Accomplishments
 
-**Feature**: Donation Banner Customization
-- Hide donation banner when resumes accessed via custom domains
-- Maintain banner visibility on main site (localhost, production)
-- Provide cleaner, more professional appearance for custom domain users
+**Problem Solved**: PDF Download Authorization Errors
+- Cloudflare R2 doesn't support S3's `setBucketPolicy()` API
+- PDF uploads succeeded but downloads failed with XML authorization errors
+- Storage service couldn't set public bucket access policy
+
+**Solution Implemented**: MinIO Deployment
+- Deployed MinIO service on Railway (S3-compatible storage)
+- MinIO supports full S3 API including bucket policies
+- Updated all storage environment variables
+- PDF generation and downloads now working correctly
 
 **Changes**:
-1. ✅ Added `isCustomDomain()` detection function to donation-banner.tsx
-2. ✅ Implemented conditional rendering based on hostname
-3. ✅ Fixed TypeScript type assertion in page.tsx (useLoaderData)
-4. ✅ Applied prettier formatting for code consistency
-5. ✅ Created comprehensive project documentation (CLAUDE.md)
+1. ✅ Analyzed codebase storage configuration (no Cloudflare-specific code)
+2. ✅ Created comprehensive MinIO setup guide
+3. ✅ Deployed MinIO service on Railway with public domain
+4. ✅ Updated 8 storage environment variables on Reactive Resume service
+5. ✅ Tested PDF generation - successful download
+6. ✅ Updated project documentation with infrastructure details
+
+**Files Added**:
+- `.claude/MINIO_SETUP.md` - Complete MinIO deployment guide for Railway
 
 **Files Modified**:
-- `apps/client/src/pages/home/components/donation-banner.tsx` - Custom domain detection + conditional render
-- `apps/client/src/pages/home/page.tsx` - TypeScript improvements, code formatting
-- `.claude/CLAUDE.md` - **NEW**: Comprehensive project documentation with fork status
+- `.claude/CLAUDE.md` - Added MinIO implementation section, infrastructure details
 
 ### Technical Implementation
 
-**Custom Domain Detection**:
-```typescript
-const isCustomDomain = () => {
-  const hostname = window.location.hostname;
-  const mainDomains = ["localhost", "josh-reactive-resume-production.up.railway.app"];
-  return !mainDomains.some((domain) => hostname.includes(domain));
-};
+**Railway Infrastructure**:
+```yaml
+MinIO Service:
+  Image: minio/minio:latest
+  Environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin123
+  Ports: 9000 (API), 9001 (console)
+  Public Domain: Generated
+
+Reactive Resume Service:
+  Storage Variables:
+    STORAGE_ENDPOINT: minio.railway.internal
+    STORAGE_PORT: 9000
+    STORAGE_URL: https://<minio-domain>.railway.app/josh-reactive-resume
+    STORAGE_BUCKET: josh-reactive-resume
+    STORAGE_USE_SSL: false
 ```
 
-**Conditional Rendering**:
-- Returns `null` (hidden) when accessed via custom domain
-- Returns full banner component on main site
-- Zero performance impact using early return pattern
+**Storage Architecture**:
+- Internal API: Service-to-service via `minio.railway.internal:9000`
+- Public Downloads: Browser access via MinIO public domain
+- Bucket Policy: Automatic public read access for user content
+- Zero code changes required (configuration only)
 
 ### Git Activity
 
-**New Commit**: `8891fb3a` - Feat: Hide donation banner on custom domains
+**New Commit**: `c657c344` - Docs: Add MinIO storage implementation documentation
 
 **Commit Details**:
-- 2 files changed, 33 insertions(+), 22 deletions(-)
-- Clean implementation with no side effects
-- Follows project commit message conventions
+- 2 files changed, 272 insertions(+), 3 deletions(-)
+- Added comprehensive MINIO_SETUP.md guide
+- Updated CLAUDE.md with infrastructure architecture
+- Clean documentation-only commit
 
-**Push Status**: ✅ Successfully pushed to origin/main (force-with-lease)
-
-### Project Documentation
-
-**New File**: `.claude/CLAUDE.md`
-
-**Contents**:
-- Project overview and fork status documentation
-- **IMPORTANT**: Permanent fork notice - NOT intended for upstream merge
-- Complete custom modifications catalog
-- Tech stack and architecture details
-- Development workflow and sync procedures
-- Known issues and maintenance notes
-
-**Key Documentation Points**:
-- ⚠️ This is a permanent custom fork
-- Custom modifications tracked and documented
-- Upstream sync strategy defined
-- Clear separation of custom vs. upstream changes
-
-### Upstream Relationship
-
-**Sync Strategy**:
-- Periodically sync with upstream/main for bug fixes and features
-- Maintain custom modifications in separate commits
-- **Never** create PRs to upstream for fork-specific changes
-- Document all custom features clearly
-
-**Current Commits Ahead**: 8 commits (7 previous + 1 new)
-1. Custom domain support (4 commits)
-2. Upstream sync documentation (2 commits)
-3. Metadata error fix (1 commit)
-4. Donation banner customization (1 commit - NEW)
+**Push Status**: ✅ Successfully pushed to origin/main
 
 ### Current State
 
 - **Branch**: main
-- **Status**: 8 commits ahead of upstream/main
-- **Build**: ✅ All 9 projects successful
-- **Lint**: ⚠️ Pre-existing upstream warnings (not blocking)
-- **TypeScript**: ✅ No errors
+- **Status**: 13 commits ahead of upstream/main
+- **Build**: ✅ All services operational
+- **PDF Generation**: ✅ Working correctly
+- **Storage**: ✅ MinIO deployed and functional
 - **Git Remote**: ✅ Synced with origin/main
-- **Documentation**: ✅ Comprehensive project docs created
+- **Documentation**: ✅ Complete setup guides available
 
-### Features Summary
+### Testing Results
 
-**Custom Domain Support** (Previous Session):
-- Database field for custom domains
-- Backend resolution API
-- Frontend configuration UI
-- Automatic routing
-
-**Donation Banner Enhancement** (Current Session):
-- Hostname-based detection
-- Conditional banner visibility
-- Professional custom domain appearance
+✅ **PDF Generation**: Successfully generates PDFs via Browserless
+✅ **PDF Upload**: Files uploaded to MinIO without errors
+✅ **PDF Download**: Browser downloads work correctly
+✅ **Custom Domains**: PDF access works via custom domains
 
 ### Next Steps
 
-No immediate action required. System is stable and fully functional.
+No immediate action required. System is fully operational.
 
-**Future Considerations**:
-- Monitor upstream for security updates
-- Test features after upstream syncs
-- Consider additional custom domain enhancements
-- Maintain documentation currency
+**Maintenance**:
+- Monitor MinIO storage usage and performance
+- Verify PDF generation continues working after deployments
+- Consider MinIO backup/persistence strategy if needed

@@ -54,7 +54,7 @@ Hides donation banner when resumes are accessed via custom domains for a cleaner
 - `apps/client/src/pages/home/page.tsx` (TypeScript improvements)
 
 ### 3. MinIO Storage Implementation (2025-10-31)
-**Commit**: TBD
+**Commit**: `c657c344`
 
 Fixed PDF generation and download functionality by migrating from Cloudflare R2 to MinIO storage.
 
