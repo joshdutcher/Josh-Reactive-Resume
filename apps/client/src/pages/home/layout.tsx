@@ -1,13 +1,21 @@
 import { ScrollArea } from "@reactive-resume/ui";
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
+import type { ResumeDto } from "@reactive-resume/dto";
 
 import { Footer } from "./components/footer";
 import { Header } from "./components/header";
 
-export const HomeLayout = () => (
-  <ScrollArea orientation="vertical" className="h-screen">
-    <Header />
-    <Outlet />
-    <Footer />
-  </ScrollArea>
-);
+export const HomeLayout = () => {
+  const data = useLoaderData<ResumeDto | null>();
+
+  // Hide footer when displaying a resume via custom domain
+  const isCustomDomainResume = data && "id" in data && "data" in data;
+
+  return (
+    <ScrollArea orientation="vertical" className="h-screen">
+      <Header />
+      <Outlet />
+      {!isCustomDomainResume && <Footer />}
+    </ScrollArea>
+  );
+};
