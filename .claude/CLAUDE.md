@@ -53,6 +53,42 @@ Hides donation banner when resumes are accessed via custom domains for a cleaner
 - `apps/client/src/pages/home/components/donation-banner.tsx`
 - `apps/client/src/pages/home/page.tsx` (TypeScript improvements)
 
+### 3. MinIO Storage Implementation (2025-10-31)
+**Commit**: TBD
+
+Fixed PDF generation and download functionality by migrating from Cloudflare R2 to MinIO storage.
+
+**Problem**: Cloudflare R2 doesn't support S3's `setBucketPolicy()` API, causing authorization errors when downloading generated PDFs.
+
+**Solution**: Deployed MinIO on Railway as S3-compatible storage service with public bucket access.
+
+**Changes**:
+- Railway: Deployed MinIO service with public domain
+- Railway: Updated storage environment variables to point to MinIO
+- Documentation: Created comprehensive MinIO setup guide
+
+**Infrastructure**:
+- MinIO Service: `minio/minio:latest` Docker image on Railway
+- Storage Architecture: Internal API access + public file downloads
+- Bucket Policy: Automatic public access for `/resumes/`, `/pictures/`, `/previews/`
+
+**Files Added**:
+- `.claude/MINIO_SETUP.md` - Complete MinIO deployment guide
+
+**Configuration**:
+```bash
+# MinIO Service (Railway)
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin123
+
+# Reactive Resume Service (Railway)
+STORAGE_ENDPOINT=minio.railway.internal
+STORAGE_PORT=9000
+STORAGE_URL=https://<minio-domain>.railway.app/josh-reactive-resume
+STORAGE_BUCKET=josh-reactive-resume
+STORAGE_USE_SSL=false
+```
+
 ## Tech Stack
 
 **Frontend**:
@@ -73,6 +109,8 @@ Hides donation banner when resumes are accessed via custom domains for a cleaner
 - NX monorepo (9 projects: 3 apps, 6 libs)
 - pnpm 10.18.1
 - Node.js ≥22.13.1
+- MinIO (S3-compatible object storage)
+- Browserless (Chrome for PDF rendering)
 
 ## Development Workflow
 
@@ -140,14 +178,33 @@ tools/
 
 ## Deployment Configuration
 
-**Main Domains**:
-- Development: `localhost:3000`
-- Production: `josh-reactive-resume-production.up.railway.app`
+**Railway Services**:
+1. **Reactive Resume** (main app)
+   - Domain: `josh-reactive-resume-production.up.railway.app`
+   - Tech: NestJS backend + React frontend
+   - Port: 3000
+
+2. **MinIO** (storage)
+   - Domain: `<generated>.railway.app`
+   - Tech: MinIO S3-compatible storage
+   - Ports: 9000 (API), 9001 (console)
+
+3. **Browserless** (PDF rendering)
+   - Internal: `browserless.railway.internal:3001`
+   - Tech: Chrome headless for PDF generation
+
+4. **PostgreSQL** (database)
+   - Internal: Railway-managed Postgres
 
 **Custom Domains**:
 - Configured per-resume in database
 - DNS CNAME pointing to production domain
 - Automatic detection and routing
+
+**Storage Architecture**:
+- Internal API: Services communicate via `minio.railway.internal:9000`
+- Public Downloads: Browsers access files via MinIO public domain
+- Bucket Policy: Public read access for user-generated content
 
 ## Known Issues
 
@@ -191,6 +248,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - [ ] Test custom domain functionality after upstream sync
 - [ ] Verify donation banner behavior remains correct
 - [ ] Check database migrations compatibility
+- [ ] Monitor MinIO storage usage and performance
+- [ ] Verify PDF generation works after Railway deployments
 
 ### Future Enhancements (Potential)
 - Additional custom domain features
