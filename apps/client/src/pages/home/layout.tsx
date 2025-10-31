@@ -8,12 +8,12 @@ import { Header } from "./components/header";
 export const HomeLayout = () => {
   const data = useLoaderData<ResumeDto | null>();
 
-  // Hide footer when displaying a resume via custom domain
+  // Hide header and footer when displaying a resume via custom domain
   const isCustomDomainResume = data && "id" in data && "data" in data;
 
   return (
     <ScrollArea orientation="vertical" className="h-screen">
-      <Header />
+      {!isCustomDomainResume && <Header />}
       <Outlet />
       {!isCustomDomainResume && <Footer />}
     </ScrollArea>
