@@ -1,26 +1,15 @@
 import { t } from "@lingui/macro";
 import { Separator } from "@reactive-resume/ui";
-import { Link, useLoaderData } from "react-router";
-import type { ResumeDto } from "@reactive-resume/dto";
+import { Link } from "react-router";
 
 import { Copyright } from "@/client/components/copyright";
 import { LocaleSwitch } from "@/client/components/locale-switch";
 import { Logo } from "@/client/components/logo";
 import { ThemeSwitch } from "@/client/components/theme-switch";
 
-export const Footer = () => {
-  const data = useLoaderData<ResumeDto | null>();
-
-  // Hide footer when displaying a resume via custom domain
-  const isCustomDomainResume = data && "id" in data && "data" in data;
-
-  if (isCustomDomainResume) {
-    return null;
-  }
-
-  return (
-    <footer className="bg-background">
-      <Separator />
+export const Footer = () => (
+  <footer className="bg-background">
+    <Separator />
 
     <div className="container grid py-12 sm:grid-cols-3 lg:grid-cols-4">
       <div className="flex flex-col gap-y-2">
@@ -65,5 +54,4 @@ export const Footer = () => {
       </div>
     </div>
   </footer>
-  );
-};
+);
