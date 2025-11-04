@@ -53,22 +53,27 @@ Hides donation banner when resumes are accessed via custom domains for a cleaner
 - `apps/client/src/pages/home/components/donation-banner.tsx`
 - `apps/client/src/pages/home/page.tsx` (TypeScript improvements)
 
-### 2.5. Footer Cleanup for Custom Domains (2025-10-31)
-**Commits**: `7ea5923f`, `78c4a725`, `a88da54f`
+### 3. Footer Cleanup for Custom Domains (2025-11-03)
+**Commit**: `b0d0d842`
 
 Hides footer section (separator, branding, DigitalOcean badge) when viewing resumes via custom domains, providing a clean professional presentation.
 
-**Changes**:
-- Added custom domain resume detection in Footer component
-- Footer returns `null` when displaying custom domain resume
-- Component-level conditional logic using `useLoaderData`
-- Maintains clean separation and React best practices
+**Implementation**:
+- Layout-level conditional rendering of Footer component
+- Hostname-based detection in HomeLayout
+- Footer component reverted to upstream version (simpler, closer to upstream)
 
 **Files Modified**:
-- `apps/client/src/pages/home/components/footer.tsx` - Added detection logic
-- `apps/client/src/pages/home/layout.tsx` - No permanent changes (reverted)
+- `apps/client/src/pages/home/layout.tsx` - Added `isCustomDomain()` check, conditional Footer rendering
+- `apps/client/src/pages/home/components/footer.tsx` - Reverted to upstream version
 
-### 3. MinIO Storage Implementation (2025-10-31)
+**Why This Approach**:
+- More reliable than component-level conditional returns
+- Avoids SSR/hydration timing issues
+- Keeps Footer component simple and upstream-compatible
+- Single source of truth for custom domain detection
+
+### 4. MinIO Storage Implementation (2025-10-31)
 **Commit**: `c657c344`
 
 Fixed PDF generation and download functionality by migrating from Cloudflare R2 to MinIO storage.
@@ -76,11 +81,6 @@ Fixed PDF generation and download functionality by migrating from Cloudflare R2 
 **Problem**: Cloudflare R2 doesn't support S3's `setBucketPolicy()` API, causing authorization errors when downloading generated PDFs.
 
 **Solution**: Deployed MinIO on Railway as S3-compatible storage service with public bucket access.
-
-**Changes**:
-- Railway: Deployed MinIO service with public domain
-- Railway: Updated storage environment variables to point to MinIO
-- Documentation: Created comprehensive MinIO setup guide
 
 **Infrastructure**:
 - MinIO Service: `minio/minio:latest` Docker image on Railway
@@ -193,33 +193,77 @@ tools/
 
 ## Deployment Configuration
 
-**Railway Services**:
+⚠️ **This fork is specifically designed for Railway deployment.** While upstream Reactive Resume supports various platforms (Docker, Vercel, Netlify), this fork contains Railway-specific configurations that may require modification for other hosting providers.
+
+**For complete deployment instructions, see [`.claude/RAILWAY_DEPLOYMENT.md`](.claude/RAILWAY_DEPLOYMENT.md)**
+
+### Railway Service Architecture
+
+This deployment uses **4 interconnected Railway services**:
+
 1. **Reactive Resume** (main app)
    - Domain: `josh-reactive-resume-production.up.railway.app`
    - Tech: NestJS backend + React frontend
    - Port: 3000
+   - Access: Public HTTPS
 
 2. **MinIO** (storage)
    - Domain: `<generated>.railway.app`
    - Tech: MinIO S3-compatible storage
    - Ports: 9000 (API), 9001 (console)
+   - Access: Public HTTPS (for downloads), Internal (for API)
 
 3. **Browserless** (PDF rendering)
    - Internal: `browserless.railway.internal:3001`
    - Tech: Chrome headless for PDF generation
+   - Access: Private (Railway internal network only)
 
 4. **PostgreSQL** (database)
    - Internal: Railway-managed Postgres
+   - Access: Private (Railway internal network only)
 
-**Custom Domains**:
-- Configured per-resume in database
-- DNS CNAME pointing to production domain
-- Automatic detection and routing
+### Custom Domains
 
-**Storage Architecture**:
-- Internal API: Services communicate via `minio.railway.internal:9000`
-- Public Downloads: Browsers access files via MinIO public domain
-- Bucket Policy: Public read access for user-generated content
+Resume-level custom domains are supported:
+- Configured per-resume in database (`Resume.customDomain`)
+- DNS: CNAME → Railway production domain
+- Automatic hostname detection and routing
+- Professional presentation (hides donation banner & footer)
+
+### Storage Architecture
+
+Dual-access pattern for MinIO storage:
+- **Internal API**: Services communicate via `minio.railway.internal:9000` (no SSL)
+- **Public Downloads**: Browsers access files via public HTTPS URL
+- **Bucket Policy**: Public read-only access for `/resumes/`, `/pictures/`, `/previews/`
+
+### Quick Start for Railway Deployment
+
+```bash
+# 1. Fork and clone repository
+git clone https://github.com/yourusername/Josh-Reactive-Resume.git
+
+# 2. Create Railway project with 4 services:
+#    - PostgreSQL (database)
+#    - MinIO (Docker: minio/minio:latest)
+#    - Browserless (Docker: browserless/chrome:latest)
+#    - Main App (connected to GitHub repo)
+
+# 3. Configure environment variables (see RAILWAY_DEPLOYMENT.md)
+
+# 4. Deploy and run migrations
+railway run pnpm prisma:migrate:deploy
+
+# 5. Configure MinIO bucket policy for public access
+```
+
+**Detailed Instructions**: See [`.claude/RAILWAY_DEPLOYMENT.md`](.claude/RAILWAY_DEPLOYMENT.md) for:
+- Complete environment variable configuration
+- Service setup and networking
+- MinIO bucket policy configuration
+- Troubleshooting guides
+- Cost optimization tips
+- Migration from upstream
 
 ## Known Issues
 
@@ -227,6 +271,9 @@ tools/
 - jsonc-eslint-parser missing in 4 libs (schema, utils, dto, parser)
 - Prettier warning in gengar.tsx:534
 - i18n issues in sharing.tsx (pre-existing)
+
+**React Router Informational Warning**:
+- `No HydrateFallback element provided` - Harmless SSR hydration message, no functionality impact
 
 **Build Status**: ✅ All 9 projects build successfully
 **TypeScript**: ✅ No errors
@@ -256,27 +303,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **Types**: Feat, Fix, Refactor, Docs, Style, Test, Chore
 
-## Maintenance Notes
-
-### Regular Tasks
-- [ ] Sync with upstream monthly for security updates
-- [ ] Test custom domain functionality after upstream sync
-- [ ] Verify donation banner behavior remains correct
-- [ ] Check database migrations compatibility
-- [ ] Monitor MinIO storage usage and performance
-- [ ] Verify PDF generation works after Railway deployments
-
-### Future Enhancements (Potential)
-- Additional custom domain features
-- More UI customizations for personal branding
-- Enhanced analytics for custom domain traffic
-- Custom themes per domain
-
 ## Support & Documentation
+
+**Fork-Specific Documentation**:
+- [`.claude/CLAUDE.md`](.claude/CLAUDE.md) - Project overview and custom modifications
+- [`.claude/RAILWAY_DEPLOYMENT.md`](.claude/RAILWAY_DEPLOYMENT.md) - Complete Railway deployment guide
+- [`.claude/MINIO_SETUP.md`](.claude/MINIO_SETUP.md) - MinIO storage configuration
+- [`.claude/SESSION.md`](.claude/SESSION.md) - Current session state
 
 **Upstream Documentation**: https://docs.rxresu.me
 **Upstream Repository**: https://github.com/AmruthPillai/Reactive-Resume
 **Issues**: File in personal fork, not upstream
+
+**Railway Resources**:
+- Railway Documentation: https://docs.railway.app
+- Railway CLI: `npm install -g @railway/cli`
+- Railway Community: https://discord.gg/railway
 
 ## License
 

@@ -1,4 +1,14 @@
-> **Note**: This is a customized fork of Reactive Resume with additional features for custom domain support. For the official version, visit [rxresu.me](https://rxresu.me/).
+# Josh's Reactive Resume - Custom Fork
+
+> **Important**: This is a **permanent custom fork** of Reactive Resume with Railway-specific deployment configuration and additional features including:
+> - ✅ Custom domain support for individual resumes
+> - ✅ MinIO storage integration (Railway-optimized)
+> - ✅ Professional presentation mode (hides branding on custom domains)
+> - ✅ Railway-specific service architecture
+>
+> **This fork is designed exclusively for Railway deployment.** For other deployment methods or the official version, visit [rxresu.me](https://rxresu.me/).
+>
+> 📚 **Documentation**: See [`.claude/RAILWAY_DEPLOYMENT.md`](.claude/RAILWAY_DEPLOYMENT.md) for complete deployment instructions.
 
 ---
 
