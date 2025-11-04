@@ -36,6 +36,9 @@ testem.log
 # Local files/assets
 /.local
 
+# MCP Server Data
+.playwright-mcp/
+
 # System Files
 .DS_Store
 Thumbs.db
