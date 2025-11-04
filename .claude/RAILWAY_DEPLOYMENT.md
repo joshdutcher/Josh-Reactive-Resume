@@ -144,12 +144,19 @@ CHROME_URL=ws://browserless.railway.internal:3001
 STORAGE_ENDPOINT=minio.railway.internal
 ```
 
-**Custom Domains**:
-1. Go to service "Settings" → "Domains"
+**Railway Service Custom Domain** (for main app):
+1. Go to Reactive Resume service "Settings" → "Domains"
 2. Click "Custom Domain"
-3. Add your domain (e.g., `resume.yourdomain.com`)
+3. Add your main app domain (e.g., `resumes.yourdomain.com`)
 4. Configure DNS: CNAME → `<your-app>.up.railway.app`
 5. Update `PUBLIC_URL` environment variable to match custom domain
+
+**Resume-Level Custom Domains** (per-resume custom domains):
+1. Open the resume you want to share in the builder
+2. Go to the "Sharing" section in the right sidebar
+3. Enter your custom domain in the "Custom Domain" field (e.g., `resume.yourdomain.com`)
+4. Configure DNS: CNAME → your main Railway app domain
+5. Resume will be accessible via the custom domain with professional presentation (no branding)
 
 ### 3. MinIO (Object Storage)
 
@@ -492,20 +499,50 @@ railway run pnpm prisma:migrate:deploy
 ### Custom Domain Not Working
 **Symptoms**: Custom domain doesn't load or shows certificate errors
 
+#### Railway Service Domain (Main App)
 **Checks**:
 1. DNS CNAME is correct and propagated
-2. Domain added in Railway dashboard
+2. Domain added in Railway dashboard (Settings → Domains)
 3. `PUBLIC_URL` environment variable updated
 4. SSL certificate issued (can take 5-10 minutes)
 
 **Debug**:
 ```bash
 # Check DNS propagation
-dig resume.yourdomain.com
+dig resumes.yourdomain.com
 
 # Check SSL certificate
-curl -vI https://resume.yourdomain.com
+curl -vI https://resumes.yourdomain.com
 ```
+
+#### Resume-Level Custom Domain
+**Checks**:
+1. Custom domain entered in resume's Sharing section
+2. DNS CNAME points to your main Railway app domain
+3. Main Railway app is accessible
+4. Resume visibility is set to "public"
+5. Custom domain is saved in database (`Resume.customDomain`)
+
+**Debug**:
+```bash
+# Check DNS propagation
+dig resume.yourdomain.com
+
+# Verify CNAME points to Railway app
+dig resume.yourdomain.com CNAME
+
+# Test main app works
+curl -I https://your-main-app.up.railway.app
+
+# Check if resume is accessible via main app
+curl -I https://your-main-app.up.railway.app/username/resume-slug
+```
+
+**Common Issues**:
+- DNS propagation can take up to 48 hours
+- Custom domain must be unique across all resumes
+- Resume must be public for custom domain to work
+- Browser cache may show old content - try incognito mode
 
 ### Build Failures
 **Symptoms**: Deployment fails during build

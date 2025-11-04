@@ -225,10 +225,18 @@ This deployment uses **4 interconnected Railway services**:
 ### Custom Domains
 
 Resume-level custom domains are supported:
-- Configured per-resume in database (`Resume.customDomain`)
-- DNS: CNAME → Railway production domain
-- Automatic hostname detection and routing
-- Professional presentation (hides donation banner & footer)
+- **Configuration**: Enter custom domain in resume's "Sharing" section
+- **Database**: Stored in `Resume.customDomain` field (unique per resume)
+- **DNS Setup**: CNAME → Railway production domain
+- **Routing**: Automatic hostname detection and routing
+- **Presentation**: Professional mode (hides donation banner & footer on custom domains)
+
+**How to Configure**:
+1. Open resume in builder
+2. Navigate to "Sharing" section (right sidebar)
+3. Enter custom domain (e.g., `resume.yourdomain.com`)
+4. Configure DNS CNAME pointing to Railway app
+5. Resume accessible via custom domain with clean branding
 
 ### Storage Architecture
 
