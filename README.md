@@ -1,3 +1,7 @@
+> **Note**: This is a customized fork of Reactive Resume with additional features for custom domain support. For the official version, visit [rxresu.me](https://rxresu.me/).
+
+---
+
 <div align="center" markdown="1">
   <a href="https://go.warp.dev/Reactive-Resume">
     <img alt="Warp Sponsorship" width="400" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-03.png?raw=true" />
@@ -114,3 +118,16 @@ A passion project by [Amruth Pillai](https://www.amruthpillai.com/)
     <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_blue.svg" width="200px">
   </a>
 </p>
+
+---
+
+## About This Fork
+
+This is a customized fork maintained by [Josh Dutcher](https://github.com/joshdutcher) with additional features:
+- Custom domain support for professional resume hosting
+- Enhanced custom domain presentation (clean, brandless display)
+- MinIO storage integration for reliable PDF generation
+
+See [customization documentation](./.claude/CLAUDE.md) for technical details.
+
+**Upstream**: [AmruthPillai/Reactive-Resume](https://github.com/AmruthPillai/Reactive-Resume)
