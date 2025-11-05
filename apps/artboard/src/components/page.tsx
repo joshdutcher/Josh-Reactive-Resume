@@ -7,11 +7,12 @@ type Props = {
   mode?: "preview" | "builder";
   pageNumber: number;
   children: React.ReactNode;
+  singlePageMode?: boolean;
 };
 
 export const MM_TO_PX = 3.78;
 
-export const Page = ({ mode = "preview", pageNumber, children }: Props) => {
+export const Page = ({ mode = "preview", pageNumber, children, singlePageMode = false }: Props) => {
   const { isDarkMode } = useTheme();
 
   const page = useArtboardStore((state) => state.resume.metadata.page);
@@ -24,7 +25,8 @@ export const Page = ({ mode = "preview", pageNumber, children }: Props) => {
       style={{
         fontFamily,
         width: `${pageSizeMap[page.format].width * MM_TO_PX}px`,
-        minHeight: `${pageSizeMap[page.format].height * MM_TO_PX}px`,
+        // Only apply minHeight constraint if not in single page mode
+        ...(singlePageMode ? {} : { minHeight: `${pageSizeMap[page.format].height * MM_TO_PX}px` }),
       }}
     >
       {mode === "builder" && page.options.pageNumbers && (

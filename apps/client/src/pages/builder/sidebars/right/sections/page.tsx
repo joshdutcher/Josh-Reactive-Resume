@@ -91,6 +91,19 @@ export const PageSection = () => {
               <Label htmlFor="metadata.page.options.pageNumbers">{t`Show Page Numbers`}</Label>
             </div>
           </div>
+
+          <div className="py-2">
+            <div className="flex items-center gap-x-4">
+              <Switch
+                id="metadata.page.options.hidePageBreaksWeb"
+                checked={page.options.hidePageBreaksWeb}
+                onCheckedChange={(checked) => {
+                  setValue("metadata.page.options.hidePageBreaksWeb", checked);
+                }}
+              />
+              <Label htmlFor="metadata.page.options.hidePageBreaksWeb">{t`Hide Page Breaks on Web`}</Label>
+            </div>
+          </div>
         </div>
       </main>
     </section>
