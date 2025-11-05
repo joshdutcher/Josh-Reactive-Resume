@@ -101,7 +101,7 @@ export const PageSection = () => {
                   setValue("metadata.page.options.hidePageBreaksWeb", checked);
                 }}
               />
-              <Label htmlFor="metadata.page.options.hidePageBreaksWeb">{t`Hide Page Breaks on Web`}</Label>
+              <Label htmlFor="metadata.page.options.hidePageBreaksWeb">Hide Page Breaks on Web</Label>
             </div>
           </div>
         </div>
