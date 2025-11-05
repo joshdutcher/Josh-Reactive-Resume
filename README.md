@@ -4,6 +4,7 @@
 > - ✅ Custom domain support for individual resumes
 > - ✅ MinIO storage integration (Railway-optimized)
 > - ✅ Professional presentation mode (hides branding on custom domains)
+> - ✅ Hide page breaks toggle for single-page web display
 > - ✅ Railway-specific service architecture
 >
 > **This fork is designed exclusively for Railway deployment.** For other deployment methods or the official version, visit [rxresu.me](https://rxresu.me/).
@@ -90,6 +91,7 @@ Start creating your standout resume with Reactive Resume today!
 - Design your resume with any font that's available on [Google Fonts](https://fonts.google.com/)
 - **Share a personalised link of your resume** to companies or recruiters for them to get the latest updates
 - You can track the number of views or downloads your public resume has received
+- **Hide page breaks on web view** - toggle between multi-page and single-page continuous display for better online viewing while maintaining proper page breaks for PDF generation
 - Built with state-of-the-art (at the moment) and dependable technologies that's battle tested and peer reviewed by the open-source community on GitHub
 - **MIT License**, so do what you like with the code as long as you credit the original author
 - And yes, there’s a dark mode too 🌓
@@ -136,6 +138,7 @@ A passion project by [Amruth Pillai](https://www.amruthpillai.com/)
 This is a customized fork maintained by [Josh Dutcher](https://github.com/joshdutcher) with additional features:
 - Custom domain support for professional resume hosting
 - Enhanced custom domain presentation (clean, brandless display)
+- Hide page breaks toggle for single-page web display
 - MinIO storage integration for reliable PDF generation
 
 See [customization documentation](./.claude/CLAUDE.md) for technical details.
