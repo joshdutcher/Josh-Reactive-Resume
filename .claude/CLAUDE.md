@@ -104,6 +104,38 @@ STORAGE_BUCKET=josh-reactive-resume
 STORAGE_USE_SSL=false
 ```
 
+### 5. Hide Page Breaks on Web Toggle (2025-11-05)
+**Commits**: `6c2fbafa`, `68664961`
+
+Adds optional single-page continuous view for web display while maintaining multi-page structure in builder and PDF generation.
+
+**Purpose**: Allows users to create resumes with page breaks for proper printing, while displaying them as a single continuous page on the web for better online viewing experience.
+
+**Changes**:
+- Schema: Added `hidePageBreaksWeb` boolean to `page.options` (default: false)
+- UI: Toggle in Page Settings → Options section
+- Rendering: Conditional single-page or multi-page rendering in preview mode
+- Column merge logic: Combines all pages into continuous columns while preserving order
+
+**Behavior**:
+- **Builder**: Unchanged, maintains page-based editing with break lines
+- **Web View (toggle OFF)**: Default multi-page display with page boundaries
+- **Web View (toggle ON)**: Single continuous page, all content flows naturally
+- **PDF Generation**: Unchanged, always generates multiple pages with proper breaks
+
+**Files Modified**:
+- `libs/schema/src/metadata/index.ts` - Schema definition
+- `libs/schema/src/sample.ts` - Sample data
+- `apps/client/src/pages/builder/sidebars/right/sections/page.tsx` - UI toggle
+- `apps/artboard/src/pages/preview.tsx` - Merge logic and conditional rendering
+- `apps/artboard/src/components/page.tsx` - Dynamic height support
+
+**Technical Details**:
+- Backward compatible (existing resumes default to false)
+- No database migration required (JSON-stored metadata)
+- Preserves column structure during merge (left stays left, right stays right)
+- Section order maintained within each column
+
 ## Tech Stack
 
 **Frontend**:
