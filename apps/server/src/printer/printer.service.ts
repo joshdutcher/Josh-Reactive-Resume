@@ -150,11 +150,27 @@ export class PrinterService {
       // Set the data of the resume to be printed in the browser's session storage
       const numberPages = resume.data.metadata.layout.length;
 
-      await page.goto(`${url}/artboard/preview`, { waitUntil: "domcontentloaded" });
+      await page.goto(`${url}/artboard/preview?pdf=true`, { waitUntil: "domcontentloaded" });
+
+      // Force multi-page rendering for PDF generation by disabling hidePageBreaksWeb
+      // This ensures we can find all page elements during PDF generation
+      const pdfResumeData = {
+        ...resume.data,
+        metadata: {
+          ...resume.data.metadata,
+          page: {
+            ...resume.data.metadata.page,
+            options: {
+              ...resume.data.metadata.page.options,
+              hidePageBreaksWeb: false,
+            },
+          },
+        },
+      };
 
       await page.evaluate((data) => {
         window.localStorage.setItem("resume", JSON.stringify(data));
-      }, resume.data);
+      }, pdfResumeData);
 
       await Promise.all([
         page.reload({ waitUntil: "load" }),

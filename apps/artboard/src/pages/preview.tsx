@@ -36,8 +36,14 @@ export const PreviewLayout = () => {
 
   const Template = useMemo(() => getTemplate(template), [template]);
 
-  // If hidePageBreaksWeb is enabled, merge all pages into one
-  if (hidePageBreaksWeb) {
+  // Check if we're in PDF generation mode (via URL parameter)
+  const isPdfMode = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('pdf') === 'true';
+  }, []);
+
+  // If hidePageBreaksWeb is enabled AND we're not in PDF mode, merge all pages into one
+  if (hidePageBreaksWeb && !isPdfMode) {
     const mergedColumns = mergeLayout(layout as SectionKey[][][]);
 
     return (

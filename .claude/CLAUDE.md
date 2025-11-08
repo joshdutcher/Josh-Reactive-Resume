@@ -136,6 +136,26 @@ Adds optional single-page continuous view for web display while maintaining mult
 - Preserves column structure during merge (left stays left, right stays right)
 - Section order maintained within each column
 
+### 6. PDF Generation Fix for Hide Page Breaks (2025-11-08)
+**Status**: Bug fix for feature #5
+
+Fixed PDF generation failure when `hidePageBreaksWeb` is enabled. The single-page web view was incompatible with PDF generation logic that expects multiple page elements.
+
+**Problem**:
+- Error: `TypeError: Cannot read properties of null (reading 'cloneNode')`
+- Occurred when PDF generator tried to access page elements 2+ that didn't exist in single-page mode
+
+**Solution**:
+- Backend: Override `hidePageBreaksWeb=false` in resume data before PDF generation
+- Frontend: Detect `?pdf=true` URL parameter to force multi-page rendering
+- Dual-layer approach ensures PDF generation always works regardless of web preference
+
+**Files Modified**:
+- `apps/server/src/printer/printer.service.ts` - Override setting and add URL parameter
+- `apps/artboard/src/pages/preview.tsx` - Detect PDF mode and force multi-page
+
+**Result**: PDF generation works correctly while web preview respects user's hidePageBreaksWeb preference
+
 ## Tech Stack
 
 **Frontend**:
