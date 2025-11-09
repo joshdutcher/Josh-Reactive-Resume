@@ -4,7 +4,7 @@ ALTER TABLE "Resume" ADD COLUMN "customDomains" TEXT[] DEFAULT '{}';
 
 -- Step 2: Migrate existing single domains to array (preserve data)
 UPDATE "Resume"
-SET "customDomains" = ARRAY[customDomain]::TEXT[]
+SET "customDomains" = ARRAY["customDomain"]::TEXT[]
 WHERE "customDomain" IS NOT NULL;
 
 -- Step 3: Drop unique index
