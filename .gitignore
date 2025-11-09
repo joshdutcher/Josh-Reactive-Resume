@@ -32,6 +32,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+.railway/
 
 # Local files/assets
 /.local
