@@ -52,13 +52,13 @@ model Secrets {
 
 model Resume {
   id           String      @id @default(cuid())
-  title        String
-  slug         String
-  data         Json        @default("{}")
-  visibility   Visibility  @default(private)
-  locked       Boolean     @default(false)
-  customDomain String?     @unique
-  statistics   Statistics?
+  title         String
+  slug          String
+  data          Json         @default("{}")
+  visibility    Visibility   @default(private)
+  locked        Boolean      @default(false)
+  customDomains String[]     @default([])
+  statistics    Statistics?
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())

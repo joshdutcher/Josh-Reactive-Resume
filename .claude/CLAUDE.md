@@ -156,6 +156,58 @@ Fixed PDF generation failure when `hidePageBreaksWeb` is enabled. The single-pag
 
 **Result**: PDF generation works correctly while web preview respects user's hidePageBreaksWeb preference
 
+### 7. Multiple Custom Domains Support (2025-11-08)
+**Status**: Enhancement of feature #1
+
+Upgraded single custom domain to support up to 5 custom domains per resume, solving www/non-www URL matching and allowing multiple domain configurations.
+
+**Problem**:
+- Original implementation only supported one custom domain
+- Users couldn't configure both `example.com` and `www.example.com` for the same resume
+- DNS URL redirects with masking didn't work (hostname mismatch)
+
+**Solution**:
+- Database: Migrated `customDomain String?` to `customDomains String[]` array
+- Backend: Array-based domain lookup with global uniqueness validation
+- Frontend: Multi-domain UI with add/remove functionality and inline validation
+- Limit: Maximum 5 domains per resume
+
+**Changes**:
+- Schema: Changed to `customDomains String[] @default([])`
+- Migration: Preserves existing single domain data during conversion
+- DTO: Array validation with format stripping (removes http://, trailing slashes)
+- Backend query: Uses `customDomains: { has: hostname }` for domain matching
+- Uniqueness: Global validation prevents domain conflicts across resumes
+- UI: Dynamic add/remove fields with duplicate detection and format validation
+
+**Files Modified**:
+- `tools/prisma/schema.prisma` - Schema change to array
+- `tools/prisma/migrations/20251108000000_convert_custom_domain_to_array/migration.sql` - Data migration
+- `libs/dto/src/resume/resume.ts` - Array validation
+- `apps/server/src/resume/resume.service.ts` - Query logic and uniqueness validation
+- `apps/client/src/stores/resume.ts` - State management update
+- `apps/client/src/pages/builder/sidebars/right/sections/sharing.tsx` - Complete UI rewrite
+
+**Features**:
+- Up to 5 custom domains per resume
+- Globally unique domain enforcement
+- Automatic format cleaning (strips protocols, trailing slashes)
+- Duplicate detection within same resume
+- Empty field filtering (not saved, not displayed)
+- "X of 5" counter display
+- "+ Add Custom Domain" button (hidden when limit reached)
+- Individual remove buttons for each domain
+- Inline validation error messages
+
+**Technical Details**:
+- Backward compatible: Existing single domains migrated to array automatically
+- PostgreSQL native array support
+- Frontend validation + backend validation for security
+- Empty strings filtered before save
+- Domain format validation: hostname only, no http:// or trailing /
+
+**Use Case Example**: Configure both `www.joshsresume.com` and `joshsresume.com` to point to the same resume, solving DNS redirect masking issues
+
 ## Tech Stack
 
 **Frontend**:

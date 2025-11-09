@@ -1,7 +1,8 @@
 import { t } from "@lingui/macro";
-import { CopySimpleIcon } from "@phosphor-icons/react";
+import { CopySimpleIcon, Plus, TrashSimple } from "@phosphor-icons/react";
 import { Button, Input, Label, Switch, Tooltip } from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 import { useToast } from "@/client/hooks/use-toast";
 import { useUser } from "@/client/services/user";
@@ -16,11 +17,99 @@ export const SharingSection = () => {
 
   const setValue = useResumeStore((state) => state.setValue);
   const slug = useResumeStore((state) => state.resume.slug);
-  const customDomain = useResumeStore((state) => state.resume.customDomain);
+  const customDomains = useResumeStore((state) => state.resume.customDomains || []);
   const isPublic = useResumeStore((state) => state.resume.visibility === "public");
+
+  // Local state for domain management
+  const [domains, setDomains] = useState<string[]>([]);
+  const [domainErrors, setDomainErrors] = useState<Record<number, string>>({});
+
+  // Sync with store on load
+  useEffect(() => {
+    const filtered = customDomains.filter((d) => d && d.trim() !== "");
+    if (filtered.length > 0) {
+      setDomains(filtered);
+    }
+  }, [customDomains]);
 
   // Constants
   const url = `${window.location.origin}/${username}/${slug}`;
+
+  // Domain validation helper
+  const validateDomain = (domain: string, index: number): string | null => {
+    if (!domain.trim()) return null;
+
+    // Strip protocol and slashes for validation
+    const cleaned = domain.replace(/^https?:\/\//, "").replace(/\/$/, "").trim();
+
+    // Basic hostname validation
+    const hostnameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
+    if (!hostnameRegex.test(cleaned)) {
+      return t`Invalid domain format`;
+    }
+
+    // Check for duplicates (case-insensitive)
+    const cleanedDomains = domains.map((d) =>
+      d.replace(/^https?:\/\//, "").replace(/\/$/, "").trim().toLowerCase(),
+    );
+    const duplicateCount = cleanedDomains.filter((d) => d === cleaned.toLowerCase()).length;
+    if (duplicateCount > 1) {
+      return t`Domain already added`;
+    }
+
+    return null;
+  };
+
+  // Add new domain field
+  const addDomain = () => {
+    if (domains.length < 5) {
+      setDomains([...domains, ""]);
+    }
+  };
+
+  // Update domain value
+  const updateDomain = (index: number, value: string) => {
+    const updated = [...domains];
+    updated[index] = value;
+    setDomains(updated);
+
+    // Validate
+    const error = validateDomain(value, index);
+    setDomainErrors((prev) => ({
+      ...prev,
+      [index]: error || "",
+    }));
+
+    // Save to store (filter empty and clean)
+    const filtered = updated
+      .map((d) => d.replace(/^https?:\/\//, "").replace(/\/$/, "").trim())
+      .filter((d) => d !== "");
+    setValue("customDomains", filtered);
+  };
+
+  // Remove domain field
+  const removeDomain = (index: number) => {
+    const updated = domains.filter((_, i) => i !== index);
+    setDomains(updated);
+
+    // Clear error for this index and reindex remaining errors
+    const newErrors: Record<number, string> = {};
+    Object.entries(domainErrors).forEach(([key, value]) => {
+      const keyNum = Number(key);
+      if (keyNum < index) {
+        newErrors[keyNum] = value;
+      } else if (keyNum > index) {
+        newErrors[keyNum - 1] = value;
+      }
+    });
+    setDomainErrors(newErrors);
+
+    // Save
+    const filtered = updated
+      .map((d) => d.replace(/^https?:\/\//, "").replace(/\/$/, "").trim())
+      .filter((d) => d !== "");
+    setValue("customDomains", filtered);
+  };
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(url);
@@ -90,20 +179,47 @@ export const SharingSection = () => {
           {isPublic && (
             <motion.div
               layout
-              className="space-y-1.5"
+              className="space-y-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <Label htmlFor="custom-domain">Custom Domain (Optional)</Label>
+              <Label className="flex items-center justify-between">
+                <span>Custom Domains (Optional)</span>
+                <span className="text-xs text-muted-foreground">
+                  {domains.filter((d) => d.trim()).length} of 5
+                </span>
+              </Label>
 
-              <Input
-                id="custom-domain"
-                value={customDomain || ""}
-                placeholder="resume.yourdomain.com"
-                onChange={(e) => setValue("customDomain", e.target.value || null)}
-                className="flex-1"
-              />
+              <div className="space-y-2">
+                {domains.map((domain, index) => (
+                  <div key={index}>
+                    <div className="flex gap-x-1.5">
+                      <Input
+                        value={domain}
+                        placeholder="resume.yourdomain.com"
+                        onChange={(e) => updateDomain(index, e.target.value)}
+                        className="flex-1"
+                      />
+                      <Tooltip content={t`Remove`}>
+                        <Button size="icon" variant="ghost" onClick={() => removeDomain(index)}>
+                          <TrashSimple />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                    {domainErrors[index] && (
+                      <p className="mt-1 text-xs text-destructive">{domainErrors[index]}</p>
+                    )}
+                  </div>
+                ))}
+
+                {domains.length < 5 && (
+                  <Button variant="outline" onClick={addDomain} className="w-full">
+                    <Plus className="mr-2" size={16} />
+                    {t`Add Custom Domain`}
+                  </Button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

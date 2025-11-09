@@ -12,7 +12,16 @@ export const resumeSchema = z.object({
   data: resumeDataSchema.default(defaultResumeData),
   visibility: z.enum(["private", "public"]).default("private"),
   locked: z.boolean().default(false),
-  customDomain: z.string().nullable().optional(),
+  customDomains: z
+    .array(z.string().min(3).max(255))
+    .max(5)
+    .default([])
+    .transform((domains) =>
+      // Strip protocol, trailing slashes, normalize
+      domains
+        .map((d) => d.replace(/^https?:\/\//, "").replace(/\/$/, "").trim())
+        .filter((d) => d.length > 0),
+    ),
   userId: idSchema,
   user: userSchema.optional(),
   createdAt: dateSchema,

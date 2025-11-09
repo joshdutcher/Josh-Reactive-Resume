@@ -103,7 +103,7 @@ export class ResumeService {
 
   async findOneByCustomDomain(customDomain: string, userId?: string) {
     const resume = await this.prisma.resume.findFirstOrThrow({
-      where: { customDomain, visibility: "public" },
+      where: { customDomains: { has: customDomain }, visibility: "public" },
     });
 
     // Update statistics: increment the number of views by 1
@@ -118,6 +118,30 @@ export class ResumeService {
     return resume;
   }
 
+  private async validateCustomDomainsUnique(
+    domains: string[],
+    resumeId: string,
+  ): Promise<void> {
+    if (domains.length === 0) return;
+
+    // Check if any domain is already used by another resume
+    const existingResumes = await this.prisma.resume.findMany({
+      where: {
+        id: { not: resumeId },
+        customDomains: { hasSome: domains },
+      },
+      select: { id: true, customDomains: true },
+    });
+
+    if (existingResumes.length > 0) {
+      const conflicts = existingResumes.flatMap((r) => r.customDomains);
+      const conflictList = domains.filter((d) => conflicts.includes(d));
+      throw new BadRequestException(
+        `Custom domain(s) already in use: ${conflictList.join(", ")}`,
+      );
+    }
+  }
+
   async update(userId: string, id: string, updateResumeDto: UpdateResumeDto) {
     try {
       const { locked } = await this.prisma.resume.findUniqueOrThrow({
@@ -127,12 +151,20 @@ export class ResumeService {
 
       if (locked) throw new BadRequestException(ErrorMessage.ResumeLocked);
 
+      // Filter and normalize domains
+      const filteredDomains = (updateResumeDto.customDomains || []).filter(
+        (d) => d && d.trim() !== "",
+      );
+
+      // Validate global uniqueness
+      await this.validateCustomDomainsUnique(filteredDomains, id);
+
       return await this.prisma.resume.update({
         data: {
           title: updateResumeDto.title,
           slug: updateResumeDto.slug,
           visibility: updateResumeDto.visibility,
-          customDomain: updateResumeDto.customDomain,
+          customDomains: filteredDomains,
           data: updateResumeDto.data as Prisma.JsonObject,
         },
         where: { userId_id: { userId, id } },
