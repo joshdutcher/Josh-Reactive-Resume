@@ -208,6 +208,41 @@ Upgraded single custom domain to support up to 5 custom domains per resume, solv
 
 **Use Case Example**: Configure both `www.joshsresume.com` and `joshsresume.com` to point to the same resume, solving DNS redirect masking issues
 
+## Development Standards
+
+### i18n Policy for Fork-Specific Features
+
+⚠️ **Important**: This fork does not use internationalization (i18n) for new fork-specific features.
+
+**Rationale**: This is a permanent custom fork with features specific to Josh's deployment. Adding fork-specific text to the upstream i18n system would:
+- Create unnecessary burden on upstream translators
+- Add strings that will never be merged back to upstream
+- Complicate future upstream syncing and maintenance
+- Mix custom fork content with upstream translation workflows
+
+**Implementation Guidelines**:
+- ✅ Use plain text strings for all new fork-specific features
+- ❌ Do not use `t` macro from `@lingui/macro` for new UI elements
+- ✅ Disable i18n linting if needed: `/* eslint-disable lingui/text-restrictions */`
+- ✅ Continue using i18n for upstream features to maintain compatibility and ease future syncing
+
+**Examples**:
+```tsx
+// ❌ Don't use i18n for fork-specific features
+<Button>{t`Add Custom Domain`}</Button>
+
+// ✅ Use plain text instead
+<Button>Add Custom Domain</Button>
+```
+
+**Affected Features**:
+- Custom domain configuration UI (feature #1, #7)
+- DNS configuration help modal
+- Custom domain-specific error messages
+- Fork-specific settings and controls
+
+This policy ensures clean separation between upstream-compatible code and fork-specific customizations.
+
 ## Tech Stack
 
 **Frontend**:
