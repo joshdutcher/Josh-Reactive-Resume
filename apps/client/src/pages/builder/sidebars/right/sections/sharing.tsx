@@ -204,9 +204,9 @@ export const SharingSection = () => {
                       size="icon"
                       variant="ghost"
                       onClick={() => setDnsHelpOpen(true)}
-                      className="h-5 w-5"
+                      className="h-5 w-5 text-primary hover:bg-primary/10"
                     >
-                      <Question size={16} />
+                      <Question size={16} weight="bold" />
                     </Button>
                   </Tooltip>
                 </span>
@@ -283,9 +283,10 @@ export const SharingSection = () => {
             </div>
 
             <div>
-              <h4 className="mb-2 font-medium">Step 2: Add Domain Above</h4>
+              <h4 className="mb-2 font-medium">Step 2: Add Domain in Sharing Section</h4>
               <p className="text-sm text-muted-foreground">
-                Enter your custom domain in the field above (e.g., resume.yourdomain.com)
+                Close this modal and enter your custom domain in the Custom Domains field (e.g.,
+                resume.yourdomain.com)
               </p>
             </div>
 
