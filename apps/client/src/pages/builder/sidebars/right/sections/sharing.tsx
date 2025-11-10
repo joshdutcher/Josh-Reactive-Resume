@@ -1,6 +1,17 @@
 import { t } from "@lingui/macro";
-import { CopySimpleIcon, Plus, TrashSimple } from "@phosphor-icons/react";
-import { Button, Input, Label, Switch, Tooltip } from "@reactive-resume/ui";
+import { CopySimpleIcon, Plus, Question, TrashSimple } from "@phosphor-icons/react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  Switch,
+  Tooltip,
+} from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -23,6 +34,7 @@ export const SharingSection = () => {
   // Local state for domain management
   const [domains, setDomains] = useState<string[]>([]);
   const [domainErrors, setDomainErrors] = useState<Record<number, string>>({});
+  const [dnsHelpOpen, setDnsHelpOpen] = useState(false);
 
   // Sync with store on load
   useEffect(() => {
@@ -185,7 +197,19 @@ export const SharingSection = () => {
               exit={{ opacity: 0 }}
             >
               <Label className="flex items-center justify-between">
-                <span>Custom Domains (Optional)</span>
+                <span className="flex items-center gap-x-1.5">
+                  Custom Domains (Optional)
+                  <Tooltip content="DNS Configuration Help">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setDnsHelpOpen(true)}
+                      className="h-5 w-5"
+                    >
+                      <Question size={16} />
+                    </Button>
+                  </Tooltip>
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {domains.filter((d) => d.trim()).length} of 5
                 </span>
@@ -224,6 +248,71 @@ export const SharingSection = () => {
           )}
         </AnimatePresence>
       </main>
+
+      <Dialog open={dnsHelpOpen} onOpenChange={setDnsHelpOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>DNS Configuration Required</DialogTitle>
+            <DialogDescription>
+              To use a custom domain with your resume, you need to configure your DNS settings.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <h4 className="mb-2 font-medium">Step 1: Create a CNAME Record</h4>
+              <p className="mb-2 text-sm text-muted-foreground">
+                Log in to your domain registrar (e.g., Namecheap, GoDaddy, Cloudflare) and create a
+                CNAME record with these settings:
+              </p>
+              <div className="space-y-1 rounded-md bg-secondary p-3 font-mono text-sm">
+                <div>
+                  <span className="font-semibold">Type:</span> CNAME
+                </div>
+                <div>
+                  <span className="font-semibold">Name:</span> resume (or your preferred subdomain)
+                </div>
+                <div>
+                  <span className="font-semibold">Target:</span>{" "}
+                  {window.location.hostname.replace(/^www\./, "")}
+                </div>
+                <div>
+                  <span className="font-semibold">TTL:</span> Auto or 3600
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="mb-2 font-medium">Step 2: Add Domain Above</h4>
+              <p className="text-sm text-muted-foreground">
+                Enter your custom domain in the field above (e.g., resume.yourdomain.com)
+              </p>
+            </div>
+
+            {domains.length > 0 && (
+              <div>
+                <h4 className="mb-2 font-medium">Your Configured Domains</h4>
+                <ul className="list-inside list-disc space-y-1 text-sm">
+                  {domains
+                    .filter((d) => d.trim())
+                    .map((domain, index) => (
+                      <li key={index} className="text-muted-foreground">
+                        {domain}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3">
+              <p className="text-sm text-amber-900 dark:text-amber-100">
+                <strong>Note:</strong> DNS changes may take 24-48 hours to propagate globally.
+                After configuration, test your custom domain in an incognito window.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
