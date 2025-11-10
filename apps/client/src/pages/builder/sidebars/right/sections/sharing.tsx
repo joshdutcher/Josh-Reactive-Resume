@@ -216,7 +216,7 @@ export const SharingSection = () => {
                 {domains.length < 5 && (
                   <Button variant="outline" onClick={addDomain} className="w-full">
                     <Plus className="mr-2" size={16} />
-                    {t`Add Custom Domain`}
+                    Add Custom Domain
                   </Button>
                 )}
               </div>
