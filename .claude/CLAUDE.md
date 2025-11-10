@@ -22,191 +22,61 @@ This repository contains customizations specific to Josh's deployment and use ca
 ## Custom Modifications
 
 ### 1. Custom Domain Support (2025-10-28)
-**Commits**: `1b79bdf7`, `d5765683`, `dc29cb0c`, `c456610f`
+**Status**: Complete | **Commits**: `1b79bdf7`, `d5765683`, `dc29cb0c`, `c456610f`
 
-Allows users to serve public resumes via custom domains without redirects.
+Allows users to serve public resumes via custom domains. Added `customDomain` field to Resume schema, custom domain resolution endpoint, and sharing UI with automatic hostname detection and routing.
 
-**Changes**:
-- Database: Added `customDomain` field to Resume model (unique, optional)
-- Backend: Custom domain resolution API endpoint
-- Frontend: UI for custom domain configuration in Sharing section
-- Routing: Custom domain detection and automatic routing
-
-**Files Modified**:
-- `tools/prisma/schema.prisma` - Database schema
-- `apps/server/src/resume/resume.controller.ts` - Backend API
-- `apps/client/src/services/resume/resume.ts` - Frontend service
-- `apps/client/src/pages/builder/sidebars/right/sections/sharing.tsx` - UI
-- `apps/client/src/pages/home/page.tsx` - Routing logic
+**Files**: `schema.prisma`, `resume.controller.ts`, `resume.ts`, `sharing.tsx`, `home/page.tsx`
 
 ### 2. Donation Banner Customization (2025-10-30)
-**Commit**: `8891fb3a`
+**Status**: Complete | **Commit**: `8891fb3a`
 
-Hides donation banner when resumes are accessed via custom domains for a cleaner, more professional appearance.
+Hides donation banner on custom domain resumes for professional appearance. Conditional rendering based on hostname detection.
 
-**Changes**:
-- Added custom domain detection to donation banner component
-- Conditional rendering based on hostname
-- Banner still displays on main site (localhost, production)
-
-**Files Modified**:
-- `apps/client/src/pages/home/components/donation-banner.tsx`
-- `apps/client/src/pages/home/page.tsx` (TypeScript improvements)
+**Files**: `donation-banner.tsx`, `home/page.tsx`
 
 ### 3. Footer Cleanup for Custom Domains (2025-11-03)
-**Commit**: `b0d0d842`
+**Status**: Complete | **Commit**: `b0d0d842`
 
-Hides footer section (separator, branding, DigitalOcean badge) when viewing resumes via custom domains, providing a clean professional presentation.
+Hides footer section when viewing via custom domains. Layout-level conditional rendering with hostname detection for clean professional presentation.
 
-**Implementation**:
-- Layout-level conditional rendering of Footer component
-- Hostname-based detection in HomeLayout
-- Footer component reverted to upstream version (simpler, closer to upstream)
-
-**Files Modified**:
-- `apps/client/src/pages/home/layout.tsx` - Added `isCustomDomain()` check, conditional Footer rendering
-- `apps/client/src/pages/home/components/footer.tsx` - Reverted to upstream version
-
-**Why This Approach**:
-- More reliable than component-level conditional returns
-- Avoids SSR/hydration timing issues
-- Keeps Footer component simple and upstream-compatible
-- Single source of truth for custom domain detection
+**Files**: `layout.tsx`, `footer.tsx`
 
 ### 4. MinIO Storage Implementation (2025-10-31)
-**Commit**: `c657c344`
+**Status**: Complete | **Commit**: `c657c344`
 
-Fixed PDF generation and download functionality by migrating from Cloudflare R2 to MinIO storage.
+Migrated from Cloudflare R2 to MinIO S3-compatible storage (Railway-deployed) to fix PDF generation/download authorization. Public bucket access for `/resumes/`, `/pictures/`, `/previews/`.
 
-**Problem**: Cloudflare R2 doesn't support S3's `setBucketPolicy()` API, causing authorization errors when downloading generated PDFs.
-
-**Solution**: Deployed MinIO on Railway as S3-compatible storage service with public bucket access.
-
-**Infrastructure**:
-- MinIO Service: `minio/minio:latest` Docker image on Railway
-- Storage Architecture: Internal API access + public file downloads
-- Bucket Policy: Automatic public access for `/resumes/`, `/pictures/`, `/previews/`
-
-**Files Added**:
-- `.claude/MINIO_SETUP.md` - Complete MinIO deployment guide
-
-**Configuration**:
-```bash
-# MinIO Service (Railway)
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin123
-
-# Reactive Resume Service (Railway)
-STORAGE_ENDPOINT=minio.railway.internal
-STORAGE_PORT=9000
-STORAGE_URL=https://<minio-domain>.railway.app/josh-reactive-resume
-STORAGE_BUCKET=josh-reactive-resume
-STORAGE_USE_SSL=false
-```
+**Reference**: `.claude/MINIO_SETUP.md` for complete configuration guide
 
 ### 5. Hide Page Breaks on Web Toggle (2025-11-05)
-**Commits**: `6c2fbafa`, `68664961`
+**Status**: Complete | **Commits**: `6c2fbafa`, `68664961`
 
-Adds optional single-page continuous view for web display while maintaining multi-page structure in builder and PDF generation.
+Added `hidePageBreaksWeb` toggle to allow single-page continuous web view while preserving multi-page PDF structure. Backward compatible, JSON-stored metadata, no migration needed.
 
-**Purpose**: Allows users to create resumes with page breaks for proper printing, while displaying them as a single continuous page on the web for better online viewing experience.
-
-**Changes**:
-- Schema: Added `hidePageBreaksWeb` boolean to `page.options` (default: false)
-- UI: Toggle in Page Settings → Options section
-- Rendering: Conditional single-page or multi-page rendering in preview mode
-- Column merge logic: Combines all pages into continuous columns while preserving order
-
-**Behavior**:
-- **Builder**: Unchanged, maintains page-based editing with break lines
-- **Web View (toggle OFF)**: Default multi-page display with page boundaries
-- **Web View (toggle ON)**: Single continuous page, all content flows naturally
-- **PDF Generation**: Unchanged, always generates multiple pages with proper breaks
-
-**Files Modified**:
-- `libs/schema/src/metadata/index.ts` - Schema definition
-- `libs/schema/src/sample.ts` - Sample data
-- `apps/client/src/pages/builder/sidebars/right/sections/page.tsx` - UI toggle
-- `apps/artboard/src/pages/preview.tsx` - Merge logic and conditional rendering
-- `apps/artboard/src/components/page.tsx` - Dynamic height support
-
-**Technical Details**:
-- Backward compatible (existing resumes default to false)
-- No database migration required (JSON-stored metadata)
-- Preserves column structure during merge (left stays left, right stays right)
-- Section order maintained within each column
+**Files**: `metadata/index.ts`, `sample.ts`, `page.tsx` (builder & artboard), `preview.tsx`
 
 ### 6. PDF Generation Fix for Hide Page Breaks (2025-11-08)
-**Status**: Bug fix for feature #5
+**Status**: Complete | **Commit**: Bug fix for feature #5
 
-Fixed PDF generation failure when `hidePageBreaksWeb` is enabled. The single-page web view was incompatible with PDF generation logic that expects multiple page elements.
+Fixed PDF generation failure by overriding `hidePageBreaksWeb=false` during PDF rendering and detecting `?pdf=true` URL parameter for forced multi-page rendering.
 
-**Problem**:
-- Error: `TypeError: Cannot read properties of null (reading 'cloneNode')`
-- Occurred when PDF generator tried to access page elements 2+ that didn't exist in single-page mode
-
-**Solution**:
-- Backend: Override `hidePageBreaksWeb=false` in resume data before PDF generation
-- Frontend: Detect `?pdf=true` URL parameter to force multi-page rendering
-- Dual-layer approach ensures PDF generation always works regardless of web preference
-
-**Files Modified**:
-- `apps/server/src/printer/printer.service.ts` - Override setting and add URL parameter
-- `apps/artboard/src/pages/preview.tsx` - Detect PDF mode and force multi-page
-
-**Result**: PDF generation works correctly while web preview respects user's hidePageBreaksWeb preference
+**Files**: `printer.service.ts`, `preview.tsx`
 
 ### 7. Multiple Custom Domains Support (2025-11-08)
-**Status**: Enhancement of feature #1
+**Status**: Complete | **Commits**: Migration fix `fc1c62b0`
 
-Upgraded single custom domain to support up to 5 custom domains per resume, solving www/non-www URL matching and allowing multiple domain configurations.
+Upgraded from single to 5 custom domains per resume. Migrated schema from `customDomain String?` to `customDomains String[]` with global uniqueness validation. Multi-domain UI with add/remove, automatic format cleaning, limit enforcement.
 
-**Problem**:
-- Original implementation only supported one custom domain
-- Users couldn't configure both `example.com` and `www.example.com` for the same resume
-- DNS URL redirects with masking didn't work (hostname mismatch)
+**Migration Reference**: `.claude/MIGRATION_RECOVERY.md` for PostgreSQL migration details
+**Files**: `schema.prisma`, `migration.sql`, `resume.ts` (DTO), `resume.service.ts`, `resume` store, `sharing.tsx`
 
-**Solution**:
-- Database: Migrated `customDomain String?` to `customDomains String[]` array
-- Backend: Array-based domain lookup with global uniqueness validation
-- Frontend: Multi-domain UI with add/remove functionality and inline validation
-- Limit: Maximum 5 domains per resume
+### 8. Mobile Viewport Optimization (2025-11-10)
+**Status**: Complete | **Commit**: `97ad6ae6`
 
-**Changes**:
-- Schema: Changed to `customDomains String[] @default([])`
-- Migration: Preserves existing single domain data during conversion
-- DTO: Array validation with format stripping (removes http://, trailing slashes)
-- Backend query: Uses `customDomains: { has: hostname }` for domain matching
-- Uniqueness: Global validation prevents domain conflicts across resumes
-- UI: Dynamic add/remove fields with duplicate detection and format validation
+Fixed mobile zoom/viewport for custom domain resumes. Added `maxWidth: 100%` to container/iframe and explicit viewport meta tag to enable proper mobile scaling while maintaining desktop/print layouts.
 
-**Files Modified**:
-- `tools/prisma/schema.prisma` - Schema change to array
-- `tools/prisma/migrations/20251108000000_convert_custom_domain_to_array/migration.sql` - Data migration
-- `libs/dto/src/resume/resume.ts` - Array validation
-- `apps/server/src/resume/resume.service.ts` - Query logic and uniqueness validation
-- `apps/client/src/stores/resume.ts` - State management update
-- `apps/client/src/pages/builder/sidebars/right/sections/sharing.tsx` - Complete UI rewrite
-
-**Features**:
-- Up to 5 custom domains per resume
-- Globally unique domain enforcement
-- Automatic format cleaning (strips protocols, trailing slashes)
-- Duplicate detection within same resume
-- Empty field filtering (not saved, not displayed)
-- "X of 5" counter display
-- "+ Add Custom Domain" button (hidden when limit reached)
-- Individual remove buttons for each domain
-- Inline validation error messages
-
-**Technical Details**:
-- Backward compatible: Existing single domains migrated to array automatically
-- PostgreSQL native array support
-- Frontend validation + backend validation for security
-- Empty strings filtered before save
-- Domain format validation: hostname only, no http:// or trailing /
-
-**Use Case Example**: Configure both `www.joshsresume.com` and `joshsresume.com` to point to the same resume, solving DNS redirect masking issues
+**Files**: `public/page.tsx`
 
 ## Development Standards
 
