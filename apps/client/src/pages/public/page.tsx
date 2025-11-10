@@ -73,17 +73,18 @@ export const PublicResumePage = () => {
         <title>
           {title} - {t`Reactive Resume`}
         </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
       </Helmet>
 
       <div
-        style={{ width: `${pageSizeMap[format].width}mm` }}
+        style={{ width: `${pageSizeMap[format].width}mm`, maxWidth: "100%" }}
         className="relative z-50 overflow-hidden rounded shadow-xl sm:mx-auto sm:mb-6 sm:mt-16 print:m-0 print:shadow-none"
       >
         <iframe
           ref={frameRef}
           title={title}
           src="/artboard/preview"
-          style={{ width: `${pageSizeMap[format].width}mm`, overflow: "hidden" }}
+          style={{ width: `${pageSizeMap[format].width}mm`, maxWidth: "100%", overflow: "hidden" }}
         />
       </div>
 
