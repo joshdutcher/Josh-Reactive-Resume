@@ -148,7 +148,7 @@ const Link = ({ url, icon, iconOnRight, label, className }: LinkProps) => {
         href={url.href}
         target="_blank"
         rel="noreferrer noopener nofollow"
-        className={cn("inline-block", className)}
+        className={cn("inline-block text-primary", className)}
       >
         {label ?? (url.label || url.href)}
       </a>
