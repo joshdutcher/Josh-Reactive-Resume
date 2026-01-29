@@ -29,7 +29,7 @@ module.exports = {
             "--tw-prose-body": "var(--color-foreground)",
             "--tw-prose-headings": "var(--color-foreground)",
             "--tw-prose-lead": "var(--color-foreground)",
-            "--tw-prose-links": "var(--color-foreground)",
+            "--tw-prose-links": "var(--color-primary)",
             "--tw-prose-bold": "var(--color-foreground)",
             "--tw-prose-counters": "var(--color-foreground)",
             "--tw-prose-bullets": "var(--color-foreground)",
