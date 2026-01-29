@@ -42,6 +42,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 
 # Generated Files
 .nx
